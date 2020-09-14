@@ -36,6 +36,10 @@ config.log
 src/git.h
 src/build*
 src/local.cmake
+<<<<<<< HEAD
 src/.clangd/
 src/compile_commands.json
 src/.vscode
+=======
+src/.vscode
+>>>>>>> vscode dotfiles ignored
