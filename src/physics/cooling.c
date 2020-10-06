@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <math.h>
 
+/* Local includes */
 #include "blackhole_feedback.h"
 #include "cooling.h"
 #include "core/cooling.h"

@@ -2,6 +2,7 @@
 #include <fenv.h>
 #include <sys/stat.h>
 
+/* Local includes */
 #include "init.h"
 #include "interactive.h"
 #include "meraxes.h"
