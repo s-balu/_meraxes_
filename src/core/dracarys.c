@@ -39,7 +39,10 @@ void dracarys()
   galaxy_t* next_gal = NULL;
   galaxy_t* cur_gal = NULL;
   int i_newhalo;
+
+  /*! Number of Galaxies in the snapshot */
   int NGal = 0;
+
   int nout_gals = 0;
   int last_nout_gals = 0;
   int last_snap = 0;
@@ -52,9 +55,12 @@ void dracarys()
   int** snapshot_index_lookup = run_globals.SnapshotIndexLookup;
   trees_info_t* snapshot_trees_info = run_globals.SnapshotTreesInfo;
   double* LTTime = run_globals.LTTime;
+  
+  /*! Number of snapshots that are to be saved in output */
   int NOutputSnaps = run_globals.NOutputSnaps;
 
-  // Find what the last requested output snapshot is
+  // Find what the last requested output snapshot is 
+  /*! The last snapshot that is requested */
   for (int ii = 0; ii < NOutputSnaps; ii++)
     if (run_globals.ListOutputSnaps[ii] > last_snap)
       last_snap = run_globals.ListOutputSnaps[ii];

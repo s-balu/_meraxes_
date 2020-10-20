@@ -2,6 +2,7 @@
 #include <gsl/gsl_sort_int.h>
 #include <hdf5_hl.h>
 
+/*! Local includes */
 #include "meraxes.h"
 #include "misc_tools.h"
 #include "modifiers.h"
