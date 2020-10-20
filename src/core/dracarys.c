@@ -107,7 +107,7 @@ void dracarys()
 
     mlog("Processing snapshot %d (z = %.2f)...", MLOG_OPEN | MLOG_TIMERSTART, snapshot, run_globals.ZZ[snapshot]);
 
-    // Calculate the critical halo mass for cooling
+    /*! Calculate the critical halo mass Mvir_crit for cooling for this particular snapshot */
     if ((run_globals.params.Flag_PatchyReion) && (run_globals.params.ReionUVBFlag))
       calculate_Mvir_crit(run_globals.ZZ[snapshot]);
 
