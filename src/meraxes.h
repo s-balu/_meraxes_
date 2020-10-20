@@ -195,19 +195,40 @@ typedef struct run_params_t
   char BaryonFracModifier[STRLEN];
 
   physics_params_t physics;
-
+  
+  /*! Size of the simulation box */
   double BoxSize;
+
   double VolumeFactor;
+  
+  /*! Reduced Hubble parameter h = H/100 (km s-1 Mpc-1) */
   double Hubble_h;
+
   double BaryonFrac;
+  
+  /*! Matter (BM + DM) density parameter */
   double OmegaM;
+  
+  /*! Spatial curvature density parameter (OmegaK = 1 - Omega) */
   double OmegaK;
+
+  /*! Radiation density parameter */
   double OmegaR;
+
+  /*! Cosmological constant density parameter */ 
   double OmegaLambda;
+
+  /*! Root-mean-square matter fluctuation averaged over a sphere of radius 8h–1 Mpc */
   double Sigma8;
+
   double wLambda;
+  
   double SpectralIndex;
+
+  /*! Mass of one DM particle in the Nbody simulation */
   double PartMass;
+  
+  /*! Number of particles used in the Nbody simulation */
   long long NPart;
 
   double* MvirCrit;
