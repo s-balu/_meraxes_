@@ -1,3 +1,4 @@
+/* Local includes */
 #include "evolve.h"
 #include "blackhole_feedback.h"
 #include "cooling.h"
@@ -8,6 +9,11 @@
 #include "reincorporation.h"
 #include "star_formation.h"
 #include "supernova_feedback.h"
+
+/**
+ * @file src/physics/evolve.c
+ * @brief Evolving the galaxies forward in time
+ */
 
 //! Evolve existing galaxies forward in time
 int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)

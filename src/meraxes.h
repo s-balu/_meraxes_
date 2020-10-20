@@ -540,7 +540,7 @@ typedef struct mag_params_t
 } mag_params_t;
 #endif
 
-//! Global variables which will will be passed around
+//! Global variables which will be passed around
 typedef struct run_globals_t
 {
   struct run_params_t params;
