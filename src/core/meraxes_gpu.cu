@@ -318,6 +318,9 @@ __global__ void sanity_check_aliasing(Complex* grid, int grid_dim, int n_real, f
       i_real, grid_dim, 0, INDEX_REAL, &i_x, &i_y, &i_z); // pass i_x_start=0 'cause we want the local indices
     const int i_padded = grid_index_gpu(i_x, i_y, i_z, grid_dim, INDEX_PADDED);
     ((float*)grid)[i_padded] = fmaxf(((float*)grid)[i_padded], val);
+
+    if ((val == 0.f) && (((float*)grid)[i_padded] < ABS_TOL))
+      ((float*)grid)[i_padded] = 0.f;
   }
 }
 
@@ -398,7 +401,6 @@ __global__ void find_HII_bubbles_gpu_main_loop(const float redshift,
                                                float* J_21_at_ionization,
                                                float* z_at_ionization,
                                                float* Gamma12,
-                                               float* z_re,
                                                Complex* deltax_filtered_device,
                                                Complex* stars_filtered_device,
                                                Complex* sfr_filtered_device,
@@ -446,9 +448,6 @@ __global__ void find_HII_bubbles_gpu_main_loop(const float redshift,
           Gamma12[i_real] = (float)(Gamma_R_prefactor * sfr_density * (UnitMass_in_g / UnitTime_in_s) *
                                     pow(UnitLength_in_cm / Hubble_h, -3.) * ReionNionPhotPerBary /
                                     PROTONMASS); // Convert pixel volume (Mpc/h)^3 -> (cm)^3
-          if (z_re[i_real] < 0) {
-            z_re[i_real] = (float)redshift;
-          }
         }
       }
 

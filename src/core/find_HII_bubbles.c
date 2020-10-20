@@ -166,7 +166,6 @@ void _find_HII_bubbles(const int snapshot)
   }
 
   // Fields relevant for computing the inhomogeneous recombinations
-  float* z_re = run_globals.reion_grids.z_re;
   float* Gamma12 = run_globals.reion_grids.Gamma12;
   float* N_rec_prev = run_globals.reion_grids.N_rec_prev;
   float* N_rec = run_globals.reion_grids.N_rec;
@@ -315,13 +314,25 @@ void _find_HII_bubbles(const int snapshot)
           i_padded = grid_index(ix, iy, iz, ReionGridDim, INDEX_PADDED);
           ((float*)deltax_filtered)[i_padded] = fmaxf(((float*)deltax_filtered)[i_padded], -1 + REL_TOL);
           ((float*)stars_filtered)[i_padded] = fmaxf(((float*)stars_filtered)[i_padded], 0.0);
+          if (((float*)stars_filtered)[i_padded] < ABS_TOL) {
+            ((float*)stars_filtered)[i_padded] = 0;
+          }
           ((float*)sfr_filtered)[i_padded] = fmaxf(((float*)sfr_filtered)[i_padded], 0.0);
+          if (((float*)sfr_filtered)[i_padded] < ABS_TOL) {
+            ((float*)sfr_filtered)[i_padded] = 0;
+          }
 
           if (run_globals.params.Flag_IncludeRecombinations) {
             ((float*)N_rec_filtered)[i_padded] = fmaxf(((float*)N_rec_filtered)[i_padded], 0.0);
+            if (((float*)N_rec_filtered)[i_padded] < ABS_TOL) {
+              ((float*)N_rec_filtered)[i_padded] = 0;
+            }
           }
           if (run_globals.params.Flag_IncludeSpinTemp) {
             ((float*)x_e_filtered)[i_padded] = fmaxf(((float*)x_e_filtered)[i_padded], 0.0);
+            if (((float*)x_e_filtered)[i_padded] < ABS_TOL) {
+              ((float*)x_e_filtered)[i_padded] = 0;
+            }
             ((float*)x_e_filtered)[i_padded] = fminf(((float*)x_e_filtered)[i_padded], 0.999);
           }
         }
@@ -385,9 +396,6 @@ void _find_HII_bubbles(const int snapshot)
                   (float)(Gamma_R_prefactor * sfr_density * (units->UnitMass_in_g / units->UnitTime_in_s) *
                           pow(units->UnitLength_in_cm / run_globals.params.Hubble_h, -3.) * ReionNionPhotPerBary /
                           PROTONMASS); // Convert pixel volume (Mpc/h)^3 -> (cm)^3
-                if (z_re[i_real] < 0) {
-                  z_re[i_real] = (float)redshift;
-                }
               }
             }
 
