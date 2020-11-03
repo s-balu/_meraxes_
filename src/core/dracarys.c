@@ -40,7 +40,7 @@ void dracarys()
   galaxy_t* cur_gal = NULL;
   int i_newhalo;
 
-  /*! Number of Galaxies in the snapshot */
+  /*! Number of Galaxies in the simulation */
   int NGal = 0;
 
   int nout_gals = 0;
