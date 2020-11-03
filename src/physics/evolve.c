@@ -11,35 +11,55 @@
 #include "supernova_feedback.h"
 
 /**
- * @file src/physics/evolve.c
- * @brief Evolving the galaxies forward in time
+ * @brief  Evolves the galaxies forward in time
+ *
+ * @param fof_group The Friends-of-Friends struct that contains all the FoF groups in the simulation
+ * @param snapshot The snapshot value at which the galaxies's evolution are to be computed
+ * @param NGal Totol number of galaxies in the simulation
+ * @param Nfof Number of FoF groups
  */
-
 //! Evolve existing galaxies forward in time
 int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
 {
   galaxy_t* gal = NULL;
   halo_t* halo = NULL;
+  
+  /*! Number of galaxies in the simulation */
   int gal_counter = 0;
+
+  /*! Number of dead galaxies */
   int dead_gals = 0;
+
+  /*! Mass of the infalling gas */
   double infalling_gas = 0;
+  
+  /*! The mass that falls from the FoF group down to the central halo/galaxy ?? */ 
   double cooling_mass = 0;
+  
+  /*! The number of steps that you need to hop from one snapshot to the next. Currently  NSteps = 1 ALWAYS */
   int NSteps = run_globals.params.NSteps;
+  
+  /*! Whether Instantaneous Recycling Approximation is enabled or not. 
+  If so, the supernova feedback is instantaneous instead of spread over a number of snapshots */
   bool Flag_IRA = (bool)(run_globals.params.physics.Flag_IRA);
 
   mlog("Doing physics...", MLOG_OPEN | MLOG_TIMERSTART);
   // pre-calculate feedback tables for each lookback snapshot
   compute_stellar_feedback_tables(snapshot);
 
+  /*! Loop over all the FoF groups in the present snapshot */
   for (int i_fof = 0; i_fof < NFof; i_fof++) {
+    /*! Skip to the next FoF group if this one is empty i.e. if the halo is not occupied*/
     // First check to see if this FOF group is empty.  If it is then skip it.
     if (fof_group[i_fof].FirstOccupiedHalo == NULL)
       continue;
 
+    /*! Compute the amount of infalling gas that is to be added to the FoF group */
     infalling_gas = gas_infall(&(fof_group[i_fof]), snapshot);
-
+    
     for (int i_step = 0; i_step < NSteps; i_step++) {
       halo = fof_group[i_fof].FirstHalo;
+      /* Start with the central halo and go "down" in the halo structure of an FoF group */
       while (halo != NULL) {
         gal = halo->Galaxy;
 
