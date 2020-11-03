@@ -15,7 +15,7 @@
  *
  * @param fof_group The Friends-of-Friends struct that contains all the FoF groups in the simulation
  * @param snapshot The snapshot value at which the galaxies's evolution are to be computed
- * @param NGal Totol number of galaxies in the simulation
+ * @param NGal Total number of galaxies in the simulation
  * @param Nfof Number of FoF groups
  */
 //! Evolve existing galaxies forward in time
