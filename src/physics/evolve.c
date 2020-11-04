@@ -15,7 +15,7 @@
  *
  * @param fof_group The Friends-of-Friends struct that contains all the FoF groups in the simulation
  * @param snapshot The snapshot value at which the galaxies's evolution are to be computed
- * @param NGal Total number of galaxies in the simulation
+ * @param NGal Totol number of galaxies in the simulation
  * @param Nfof Number of FoF groups
  */
 //! Evolve existing galaxies forward in time
@@ -49,7 +49,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
 
   /*! Loop over all the FoF groups in the present snapshot */
   for (int i_fof = 0; i_fof < NFof; i_fof++) {
-    /*! Skip to the next FoF group if this one is empty i.e. if the halo is not occupied*/
+    /*! Skip to the next FoF group if this one is empty i.e. if the halo is not present*/
     // First check to see if this FOF group is empty.  If it is then skip it.
     if (fof_group[i_fof].FirstOccupiedHalo == NULL)
       continue;
@@ -62,7 +62,14 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
       /* Start with the central halo and go "down" in the halo structure of an FoF group */
       while (halo != NULL) {
         gal = halo->Galaxy;
-
+        
+        /* Cycle through all the galaxies in the present halo. Depending on the Type of the galaxy, different
+        physics are implemented. There are currently three type of galaxies that are taken into account:
+        Type 0 : Central galaxy
+        Type 1 : Satellite galaxy
+        Type 2 : Halo-less galaxy
+        Type 3 : Dead galaxy
+        */
         while (gal != NULL) {
           if (gal->Type == 0) {
             cooling_mass = gas_cooling(gal);
@@ -97,6 +104,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
         halo = halo->NextHaloInFOFGroup;
       }
 
+      
       // Check for mergers
       halo = fof_group[i_fof].FirstHalo;
       while (halo != NULL) {
