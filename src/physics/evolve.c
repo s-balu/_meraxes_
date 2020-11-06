@@ -47,7 +47,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
   // pre-calculate feedback tables for each lookback snapshot
   compute_stellar_feedback_tables(snapshot);
 
-  /*! Loop over all the FoF groups in the present snapshot */
+  /*! Loop over all the structures in the present snapshot. The hierarchy is FoF Group -> Haloes -> Galaxies */
   for (int i_fof = 0; i_fof < NFof; i_fof++) {
     /*! Skip to the next FoF group if this one is empty i.e. if the halo is not present*/
     // First check to see if this FOF group is empty.  If it is then skip it.
