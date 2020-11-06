@@ -8,23 +8,36 @@
 #include "reionization.h"
 #include "tree_flags.h"
 
+/**
+ * @brief  Computes the amount of infalling gas that gets added to an FoF group
+ *
+ * @param FOFgroup The Friends-of-Friends struct that contains all the FoF groups in the simulation
+ * @param snapshot The snapshot value at which the galaxies's evolution are to be computed
+ */
 double gas_infall(fof_group_t* FOFgroup, int snapshot)
 {
   halo_t* halo = FOFgroup->FirstHalo;
 
   galaxy_t* gal;
   galaxy_t* central;
+
   double total_baryons = 0.;
+  
+  /*! The mass of the infalling gas that is to be computed */
   double infall_mass = 0.;
+  
   double FOF_Mvir = FOFgroup->Mvir;
   double FOFMvirModifier = FOFgroup->FOFMvirModifier;
+  
+  /*! Baryon fraction modifier : parameter to represent the attenuation of the total baryon mass
+  that could have ever been successfully captured by an FoF group in its lifetime */
   double fb_modifier;
 
   double total_stellarmass = 0.0;
   double total_hotgas = 0.0;
   double total_coldgas = 0.0;
   double total_ejectedgas = 0.0;
-  double total_blackholemass = 0.0;
+  double total_blackholemass = 0.0; /*! Maddie ???. Not mentioned in Dragons3 */
 
   // Calculate the total baryon mass in the FOF group
   central = FOFgroup->FirstOccupiedHalo->Galaxy;
