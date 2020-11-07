@@ -33,7 +33,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
   /*! Mass of the infalling gas */
   double infalling_gas = 0;
   
-  /*! The mass that falls from the FoF group down to the central halo/galaxy ?? */ 
+  /*! The mass that falls from the FoF group down to the central halo/galaxy ??? */ 
   double cooling_mass = 0;
   
   /*! The number of steps that you need to hop from one snapshot to the next. Currently  NSteps = 1 ALWAYS */

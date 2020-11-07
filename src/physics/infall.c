@@ -9,7 +9,7 @@
 #include "tree_flags.h"
 
 /**
- * @brief  Computes the amount of infalling gas that gets added to an FoF group
+ * @brief  Computes the amount of infalling gas that gets added to an FoF group.
  *
  * @param FOFgroup The Friends-of-Friends struct that contains all the FoF groups in the simulation
  * @param snapshot The snapshot value at which the galaxies's evolution are to be computed
@@ -23,7 +23,7 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
 
   double total_baryons = 0.;
   
-  /*! The mass of the infalling gas that is to be computed */
+  /*! The mass of the infalling gas that remains bound to the FoFgroup and participate in galaxy formation. */
   double infall_mass = 0.;
   
   double FOF_Mvir = FOFgroup->Mvir;
@@ -42,6 +42,12 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
   // Calculate the total baryon mass in the FOF group
   central = FOFgroup->FirstOccupiedHalo->Galaxy;
 
+  /*! Loop through every galaxy in each halo of the FOFgroup.
+  Each quantity (stellarmass, hotgas mass, coldgas mass, ejectedgas mass, blackholemass) are summed up to get their total values.
+  At the same time, all of the gas mass quantities (except coldgas) in the non-central galaxies are set to zero after adding them 
+  to the central galaxy's values.
+  This amounts to the condition that all of the hotgas/ejectedgas masses are stripped from the smaller galaxies by the central 
+  galaxyand deposited to its hot halo. */
   while (halo != NULL) {
     gal = halo->Galaxy;
     while (gal != NULL) {
@@ -65,6 +71,7 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
     halo = halo->NextHaloInFOFGroup;
   }
 
+  /*! Case (iii) mentioned in the DRAGONS3 paper. Turns ON when the T_vir < 10^4 K. No cooling occurs in this case.*/
   if (check_for_flag(TREE_CASE_BELOW_VIRIAL_THRESHOLD, FOFgroup->FirstHalo->TreeFlags)) {
     // no infall and no hydrstatic hot halo in this case
     central->BaryonFracModifier = 0.0;
@@ -79,10 +86,12 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
 
   // Calculate the amount of fresh gas required to provide the baryon
   // fraction of this halo.
+  /*! ??? */
   fb_modifier = reionization_modifier(central, FOF_Mvir, snapshot);
   if (run_globals.RequestedBaryonFracModifier == 1)
     fb_modifier *= interpolate_modifier(run_globals.baryon_frac_modifier,
                                         log10(FOF_Mvir / FOFMvirModifier / run_globals.params.Hubble_h) + 10.0);
+  /*! Dragons3 eq. 1 */
   infall_mass = fb_modifier * run_globals.params.BaryonFrac * FOF_Mvir - total_baryons;
 
   // record the infall modifier
@@ -113,7 +122,7 @@ void add_infall_to_hot(galaxy_t* central, double infall_mass)
     }
 
     // if we still have mass left to remove after exhausting the mass of
-    // the ejected component, the remove as much as we can from the hot gas
+    // the ejected component, then remove as much as we can from the hot gas
     if (strip_mass > 0) {
       double metallicity = calc_metallicity(central->HotGas, central->MetalsHotGas);
       central->HotGas -= strip_mass;
