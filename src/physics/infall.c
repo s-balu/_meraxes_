@@ -37,17 +37,17 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
   double total_hotgas = 0.0;
   double total_coldgas = 0.0;
   double total_ejectedgas = 0.0;
-  double total_blackholemass = 0.0; /*! Maddie ???. Not mentioned in Dragons3 */
+ double total_blackholemass = 0.0; /*! Yuxiang ???. Not mentioned in Dragons3 */
 
   // Calculate the total baryon mass in the FOF group
   central = FOFgroup->FirstOccupiedHalo->Galaxy;
 
   /*! Loop through every galaxy in each halo of the FOFgroup.
   Each quantity (stellarmass, hotgas mass, coldgas mass, ejectedgas mass, blackholemass) are summed up to get their total values.
-  At the same time, all of the gas mass quantities (except coldgas) in the non-central galaxies are set to zero after adding them 
+  At the same time, all of the gas mass quantities (except coldgas's) in the non-central galaxies are set to zero after adding them 
   to the central galaxy's values.
   This amounts to the condition that all of the hotgas/ejectedgas masses are stripped from the smaller galaxies by the central 
-  galaxyand deposited to its hot halo. */
+  galaxy and is deposited into its hot halo. */
   while (halo != NULL) {
     gal = halo->Galaxy;
     while (gal != NULL) {
