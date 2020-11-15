@@ -40,7 +40,7 @@ void reincorporate_ejected_gas(galaxy_t* gal)
         reincorporated = gal->EjectedGas * (gal->dt / t_rein);
         break;
       default:
-        mlog_error("Unknow ReincorporationModel!");
+        mlog_error("Unknown ReincorporationModel!");
         ABORT(EXIT_FAILURE);
         break;
     }
