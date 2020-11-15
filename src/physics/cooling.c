@@ -8,6 +8,14 @@
 #include "core/misc_tools.h"
 #include "meraxes.h"
 
+/**
+ * @brief  The mass of the gas that cools down to the 
+ *
+ * @param fof_group The Friends-of-Friends struct that contains all the FoF groups in the simulation
+ * @param snapshot The snapshot value at which the galaxies's evolution are to be computed
+ * @param NGal Totol number of galaxies in the simulation
+ * @param Nfof Number of FoF groups
+ */
 double gas_cooling(galaxy_t* gal)
 {
   double cooling_mass = 0.0;

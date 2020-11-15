@@ -19,6 +19,7 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
   halo_t* halo = FOFgroup->FirstHalo;
 
   galaxy_t* gal;
+  /*! To store details about the central galaxy. This is the galaxy in the main halo of an FoF group*/
   galaxy_t* central;
 
   double total_baryons = 0.;
@@ -37,7 +38,7 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
   double total_hotgas = 0.0;
   double total_coldgas = 0.0;
   double total_ejectedgas = 0.0;
- double total_blackholemass = 0.0; /*! Yuxiang ???. Not mentioned in Dragons3 */
+  double total_blackholemass = 0.0; /*! Yuxiang ???. Not mentioned in Dragons3 */
 
   // Calculate the total baryon mass in the FOF group
   central = FOFgroup->FirstOccupiedHalo->Galaxy;
@@ -91,7 +92,7 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
   if (run_globals.RequestedBaryonFracModifier == 1)
     fb_modifier *= interpolate_modifier(run_globals.baryon_frac_modifier,
                                         log10(FOF_Mvir / FOFMvirModifier / run_globals.params.Hubble_h) + 10.0);
-  /*! Dragons3 eq. 1 */
+  /*! Dragons3 eq. 1. BaryonFrac is the universal baryonic fraction f_b = Omega_b / Omega_m */
   infall_mass = fb_modifier * run_globals.params.BaryonFrac * FOF_Mvir - total_baryons;
 
   // record the infall modifier

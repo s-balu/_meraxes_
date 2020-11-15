@@ -21,7 +21,9 @@
 //! Evolve existing galaxies forward in time
 int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
 {
+  /*! galaxy struct to store the galaxy properties */
   galaxy_t* gal = NULL;
+  /*! halo_t struct to store the halo properties */
   halo_t* halo = NULL;
   
   /*! Number of galaxies in the simulation */
@@ -30,7 +32,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
   /*! Number of dead galaxies */
   int dead_gals = 0;
 
-  /*! Mass of the infalling gas */
+  /*! Mass of the infalling gas ??? */
   double infalling_gas = 0;
   
   /*! The mass that falls from the FoF group down to the central halo/galaxy ??? */ 
@@ -49,7 +51,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
 
   /*! Loop over all the structures in the present snapshot. The hierarchy is FoF Group -> Haloes -> Galaxies */
   for (int i_fof = 0; i_fof < NFof; i_fof++) {
-    /*! Skip to the next FoF group if this one is empty i.e. if the halo is not present*/
+    /*! Skip to the next FoF group if this one is empty i.e. if there is no halo present*/
     // First check to see if this FOF group is empty.  If it is then skip it.
     if (fof_group[i_fof].FirstOccupiedHalo == NULL)
       continue;
