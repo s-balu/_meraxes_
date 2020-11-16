@@ -85,7 +85,7 @@ double gas_cooling(galaxy_t* gal)
           cooling_mass = max_cooling_mass;
       }
 
-      /*! do one last sanity check to ensure we aren't cooling more gas than is available etc. */
+      /*! Do one last sanity check to ensure we aren't cooling more gas than is available etc. */
       if (cooling_mass > gal->HotGas)
         cooling_mass = gal->HotGas;
 

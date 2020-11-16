@@ -102,7 +102,7 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
 }
 
 /**
- * @brief  Add the infalling mass to the hot halo of the central galaxy
+ * @brief  Add the infalling mass to the HotGas halo of the central galaxy.
  *
  * If the infall mass is negative, the mass is stripped from the FoF group. It is removed primarily from the EjectedGas 
  * of the central galaxy and the metallicity of the remaining EjectedGas is also updated accordingly.
