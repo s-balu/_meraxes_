@@ -92,7 +92,7 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
   if (run_globals.RequestedBaryonFracModifier == 1)
     fb_modifier *= interpolate_modifier(run_globals.baryon_frac_modifier,
                                         log10(FOF_Mvir / FOFMvirModifier / run_globals.params.Hubble_h) + 10.0);
-  /*! Dragons3 eq. 1. BaryonFrac is the universal baryonic fraction f_b = Omega_b / Omega_m */
+  /*! DRAGONS3 eq. 1. BaryonFrac is the universal baryonic fraction f_b = Omega_b / Omega_m */
   infall_mass = fb_modifier * run_globals.params.BaryonFrac * FOF_Mvir - total_baryons;
 
   // record the infall modifier
@@ -101,6 +101,16 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
   return infall_mass;
 }
 
+/**
+ * @brief  Add the infalling mass to the hot halo of the central galaxy
+ *
+ * If the infall mass is negative, the mass is stripped from the FoF group. It is removed primarily from the EjectedGas 
+ * of the central galaxy and the metallicity of the remaining EjectedGas is also updated accordingly.
+ * If there is still mass left to remove after this, then the HotGas is removed in a similar fashion.
+ * 
+ * @param central The central galaxy of the FoF group
+ * @param infall_mass The infalling mass that is to be added. Section 2.2 of DRAGONS3 paper.
+ */
 void add_infall_to_hot(galaxy_t* central, double infall_mass)
 {
   // if we have mass to add then give it to the central

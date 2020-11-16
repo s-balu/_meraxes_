@@ -32,7 +32,8 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
   /*! Number of dead galaxies */
   int dead_gals = 0;
 
-  /*! Mass of the infalling gas ??? */
+  /*! Mass of the infalling gas that is to be added to the FoF group. This mass is assumed to be shocked to the virial
+  temperature of the host FoF group */
   double infalling_gas = 0;
   
   /*! The mass that falls from the FoF group down to the central halo/galaxy ??? */ 
@@ -56,7 +57,6 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
     if (fof_group[i_fof].FirstOccupiedHalo == NULL)
       continue;
 
-    /*! Compute the amount of infalling gas that is to be added to the FoF group */
     infalling_gas = gas_infall(&(fof_group[i_fof]), snapshot);
     
     for (int i_step = 0; i_step < NSteps; i_step++) {
