@@ -9,7 +9,7 @@
 #include "meraxes.h"
 
 /**
- * @brief  The mass of the gas that cools down to the central galaxy. Section 2.3 of DRAGONS3.
+ * @brief  The mass of the gas from the HotGas that cools down to the ColdGas of the central galaxy. Section 2.3 of DRAGONS3.
  *
  * The cooling happens only if the T_vir of the FoF group is above 10^4 K. All infalling mass is assumed to have been shocked to
  * the virial temperature of the FoF group, hence T_vir = 35.9 * V_vir(in kms-1)^2. A cooling radius r_cool is defined from the

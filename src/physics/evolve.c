@@ -73,16 +73,23 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
         Type 3 : Dead galaxy
         */
         while (gal != NULL) {
+          /*! Only do this if the galaxy is the central galaxy (Type 2). */
           if (gal->Type == 0) {
+
+            /*! The cooling mass that cools down from the HotGas to the ColdGas. */
             cooling_mass = gas_cooling(gal);
 
+            /* The infalling gas is added to the HotGas. */
             add_infall_to_hot(gal, infalling_gas / ((double)NSteps));
 
+            /*! The portion of the EjectedGas is added to the HotGas. */
             reincorporate_ejected_gas(gal);
 
+            /*! The cooling_mass is added to the ColdGas from the HotGas. */
             cool_gas_onto_galaxy(gal, cooling_mass);
           }
 
+          /*! Do this for all galaxies except the Type 3 ones which are dead galaxies. */
           if (gal->Type < 3) {
             if (!Flag_IRA)
               delayed_supernova_feedback(gal, snapshot);
@@ -136,6 +143,12 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
   return gal_counter - dead_gals;
 }
 
+/**
+ * @brief Passively evolve the ghost galaxies.
+ * 
+ * @param gal The dead galaxy.
+ * @param snapshot The snapshot value at which the galaxies's evolution are to be computed.
+ */
 void passively_evolve_ghost(galaxy_t* gal, int snapshot)
 {
   // Passively evolve ghosts.
