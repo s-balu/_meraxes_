@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <gsl/gsl_integration.h>
 
+/*! Local includes */
 #include "core/magnitudes.h"
 #include "core/misc_tools.h"
 #include "core/reionization.h"
@@ -79,6 +80,12 @@ void update_reservoirs_from_sf(galaxy_t* gal, double new_stars, int snapshot, SF
   }
 }
 
+/**
+ * @brief  
+ *
+ * @param gal 
+ * @param snapshot 
+ */
 void insitu_star_formation(galaxy_t* gal, int snapshot)
 {
   // there is no point doing anything if there is no cold gas!
@@ -136,7 +143,7 @@ void insitu_star_formation(galaxy_t* gal, int snapshot)
         break;
 
       case 2:
-        // f_h2 from Blitz & Rosolowski 2006 abd Bigiel+11 SF law
+        // f_h2 from Blitz & Rosolowski 2006 and Bigiel+11 SF law
         m_stars = pressure_dependent_star_formation(gal, snapshot) * gal->dt;
         break;
 
