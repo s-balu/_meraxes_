@@ -81,14 +81,19 @@ void update_reservoirs_from_sf(galaxy_t* gal, double new_stars, int snapshot, SF
 }
 
 /**
- * @brief  
- *
- * @param gal 
- * @param snapshot 
+ * @brief Forms new set of stars and updates the gas reservoirs accordingly.
+ * 
+ * Calculates the amount of new stellar mass produced in the galaxy in the current snapshot. These stars are
+ * produced from the available ColdGas of reservior of the galaxy. The total supernova feedback is also calculated
+ * assuming that this star formation happened continuously and evenly throughout the snapshot. The baryonic reserviors 
+ * are also updated.
+ * 
+ * @param gal The galaxy for which the star formation is to be calculated.
+ * @param snapshot The snapshot at which star formation occurs.
  */
 void insitu_star_formation(galaxy_t* gal, int snapshot)
 {
-  // there is no point doing anything if there is no cold gas!
+  /*! there is no point doing anything if there is no cold gas! */
   if (gal->ColdGas > 1e-10) {
     double r_disk;
     double v_disk;
@@ -103,14 +108,17 @@ void insitu_star_formation(galaxy_t* gal, int snapshot)
     double zplus1;
     double zplus1_n;
 
+    /*! Added by Yuxiang. DRAGONS5 (maybe ?) */
     zplus1 = 1.0 + run_globals.ZZ[snapshot];
     zplus1_n = pow(zplus1, run_globals.params.physics.SfEfficiencyScaling);
 
+    /*! Star Formation parameters/prescriptions that can be changed via input */
     double SfEfficiency = run_globals.params.physics.SfEfficiency;
     double SfCriticalSDNorm = run_globals.params.physics.SfCriticalSDNorm;
     int SfDiskVelOpt = run_globals.params.physics.SfDiskVelOpt;
     int SfPrescription = run_globals.params.physics.SfPrescription;
 
+    /*! Set the v_disk value as either Vmax or Vvir */
     // What velocity are we going to use as a proxy for the disk rotation velocity?
     switch (SfDiskVelOpt) {
       case 1:
@@ -120,14 +128,13 @@ void insitu_star_formation(galaxy_t* gal, int snapshot)
         v_disk = gal->Vvir;
         break;
       default:
-        mlog_error("Unrecognised value for SfVelocityOpt parameter! Defaulting to v_disk=Vmax.");
+        mlog_error("Unrecognised value for SfVelocityOpt parameter! Defaulting to v_disk = Vmax.");
         v_disk = gal->Vmax;
         break;
     }
 
-    // calculate disk scalelength using Mo, Mao & White (1998) eqn. 12 and
-    // multiply it by 3 to approximate the star forming region size (ala
-    // Croton+ 2006).
+    /*!  Calculate disk scalelength r_disk using Mo, Mao & White (1998) eqn. 12 and multiply it by 3 
+    to approximate the star forming region size following Croton+ 2006 */
     r_disk = gal->DiskScaleLength * 3.0;
 
     switch (SfPrescription) {
@@ -159,13 +166,14 @@ void insitu_star_formation(galaxy_t* gal, int snapshot)
         break;
     }
 
+    /*! The new stars are formed from the available ColdGas of the galaxy */
     if (m_stars > gal->ColdGas)
       m_stars = gal->ColdGas;
 
-    // calculate the total supernova feedback which would occur if this star
-    // formation happened continuously and evenly throughout the snapshot
+    /*! calculate the total supernova feedback which would occur if this star
+     formation happened continuously and evenly throughout the snapshot */
     contemporaneous_supernova_feedback(gal, &m_stars, snapshot, &m_reheat, &m_eject, &m_recycled, &new_metals);
-    // update the baryonic reservoirs (note that the order we do this in will change the result!)
+    /*! update the baryonic reservoirs (note that the order we do this in will change the result!) */
     update_reservoirs_from_sf(gal, m_stars, snapshot, INSITU);
     update_reservoirs_from_sn_feedback(gal, m_reheat, m_eject, m_recycled, new_metals);
   }

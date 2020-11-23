@@ -11,18 +11,19 @@
 #include "supernova_feedback.h"
 
 /**
- * @brief  Evolves the galaxies forward in time
+ * @brief  Evolves the galaxies forward in time.
  *
- * @param fof_group The Friends-of-Friends struct that contains all the FoF groups in the simulation
- * @param snapshot The snapshot value at which the galaxies's evolution are to be computed
- * @param NGal Totol number of galaxies in the simulation
- * @param Nfof Number of FoF groups
+ * @param fof_group The fof struct that contains all the FoF groups in the simulation.
+ * @param snapshot The snapshot value at which the galaxies's evolution are to be computed.
+ * @param NGal Total number of galaxies currently exist in the simulation.
+ * @param Nfof Number of FoF groups.
  */
 //! Evolve existing galaxies forward in time
 int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
 {
   /*! galaxy struct to store the galaxy properties */
   galaxy_t* gal = NULL;
+
   /*! halo_t struct to store the halo properties */
   halo_t* halo = NULL;
   
@@ -36,7 +37,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
   temperature of the host FoF group */
   double infalling_gas = 0;
   
-  /*! The mass that falls from the FoF group down to the central halo/galaxy ??? */ 
+  /*! The mass that cools down from the HotGas to the ColdGas */ 
   double cooling_mass = 0;
   
   /*! The number of steps that you need to hop from one snapshot to the next. Currently  NSteps = 1 ALWAYS */
@@ -52,7 +53,8 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
 
   /*! Loop over all the structures in the present snapshot. The hierarchy is FoF Group -> Haloes -> Galaxies */
   for (int i_fof = 0; i_fof < NFof; i_fof++) {
-    /*! Skip to the next FoF group if this one is empty i.e. if there is no halo present*/
+
+    /*! Skip to the next FoF group if there is no halo present */
     // First check to see if this FOF group is empty.  If it is then skip it.
     if (fof_group[i_fof].FirstOccupiedHalo == NULL)
       continue;
@@ -66,14 +68,15 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
         gal = halo->Galaxy;
         
         /* Cycle through all the galaxies in the present halo. Depending on the Type of the galaxy, different
-        physics are implemented. There are currently three type of galaxies that are taken into account:
+        physics are implemented. There are currently four types of galaxies that are taken into account:
         Type 0 : Central galaxy
         Type 1 : Satellite galaxy
         Type 2 : Halo-less galaxy
         Type 3 : Dead galaxy
         */
         while (gal != NULL) {
-          /*! Only do this if the galaxy is the central galaxy (Type 2). */
+          
+          /*! Only do this if the galaxy is the central galaxy (Type 0). */
           if (gal->Type == 0) {
 
             /*! The cooling mass that cools down from the HotGas to the ColdGas. */
@@ -82,7 +85,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
             /* The infalling gas is added to the HotGas. */
             add_infall_to_hot(gal, infalling_gas / ((double)NSteps));
 
-            /*! The portion of the EjectedGas is added to the HotGas. */
+            /*! A portion of the EjectedGas is added to the HotGas. */
             reincorporate_ejected_gas(gal);
 
             /*! The cooling_mass is added to the ColdGas from the HotGas. */
@@ -91,6 +94,8 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
 
           /*! Do this for all galaxies except the Type 3 ones which are dead galaxies. */
           if (gal->Type < 3) {
+
+            /*! Apply the SN feedback as spread across the snapshot if the IRA is not set ON */
             if (!Flag_IRA)
               delayed_supernova_feedback(gal, snapshot);
 
@@ -99,7 +104,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
 
             insitu_star_formation(gal, snapshot);
 
-            // If this is a type 2 then decrement the merger clock
+            /*! If this is a Type 2 galaxy then decrement the merger clock */
             if (gal->Type == 2)
               gal->MergTime -= gal->dt;
           }
@@ -114,14 +119,16 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
       }
 
       
-      // Check for mergers
+      /*! Check for mergers */
       halo = fof_group[i_fof].FirstHalo;
+      
       while (halo != NULL) {
         gal = halo->Galaxy;
         while (gal != NULL) {
+          /*! Type 2 galaxies are the ones that are about to merge */
           if (gal->Type == 2)
-            // If the merger clock has run out or our target halo has already
-            // merged then process a merger event.
+            
+            /*! If the merger clock has run out OR our target halo has already merged then process a merger event. */
             if ((gal->MergTime < 0) || (gal->MergerTarget->Type == 3))
               merge_with_target(gal, &dead_gals, snapshot);
 
@@ -146,7 +153,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
 /**
  * @brief Passively evolve the ghost galaxies.
  * 
- * @param gal The dead galaxy.
+ * @param gal The Type 3 (dead) galaxy.
  * @param snapshot The snapshot value at which the galaxies's evolution are to be computed.
  */
 void passively_evolve_ghost(galaxy_t* gal, int snapshot)
