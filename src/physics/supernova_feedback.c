@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <math.h>
 
+/*! Local includes */
 #include "core/misc_tools.h"
 #include "core/stellar_feedback.h"
 #include "meraxes.h"
