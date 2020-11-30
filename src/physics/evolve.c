@@ -95,7 +95,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
           /*! Do this for all galaxies except the Type 3 ones which are dead galaxies. */
           if (gal->Type < 3) {
 
-            /*! Apply the SN feedback as spread across the snapshot if the IRA is not set ON */
+            /*! Apply the SN feedback as spread across the snapshot if the Flag_IRA is not set ON. */
             if (!Flag_IRA)
               delayed_supernova_feedback(gal, snapshot);
 
