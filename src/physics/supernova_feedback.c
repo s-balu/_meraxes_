@@ -122,6 +122,13 @@ static inline double calc_ejected_mass(double* m_reheat, double sn_energy, doubl
   return m_eject;
 }
 
+/**
+ * @brief  SuperNova reheating efficiency.
+ *
+ * Two different models are used for calculating this.
+ * @param gal The galaxy for which the SN reheat_eff is calculated.
+ * @param snapshot The snapshot value at which the SN reheat_eff is to be computed.
+ */
 static inline double calc_sn_reheat_eff(galaxy_t* gal, int snapshot)
 {
   double Vmax = gal->Vmax; // Vmax is in a unit of km/s
@@ -153,6 +160,13 @@ static inline double calc_sn_reheat_eff(galaxy_t* gal, int snapshot)
     return SnReheatLimit;
 }
 
+/**
+ * @brief  SuperNova ejection efficiency.
+ *
+ * Two different models are used for calculating this.
+ * @param gal The galaxy for which the SN ejection_eff is calculated.
+ * @param snapshot The snapshot value at which the SN ejection_eff is to be computed.
+ */
 static inline double calc_sn_ejection_eff(galaxy_t* gal, int snapshot)
 {
   double Vmax = gal->Vmax; // Vmax is in a unit of km/s
@@ -186,6 +200,13 @@ static inline double calc_sn_ejection_eff(galaxy_t* gal, int snapshot)
     return 1.;
 }
 
+/**
+ * @brief  Effects the delayed SuperNova feedback.
+ * 
+ * The SN feedback is assumed to be spread over the snapshot instead of an instantaneous one.
+ * @param gal The galaxy for which the SN feedback is calculated.
+ * @param snapshot The snapshot value at which the SN feedback is to be computed.
+ */
 void delayed_supernova_feedback(galaxy_t* gal, int snapshot)
 {
   double sn_energy = 0.0;
@@ -194,28 +215,36 @@ void delayed_supernova_feedback(galaxy_t* gal, int snapshot)
   double m_recycled = 0.0;
   double new_metals = 0.0;
   double fof_Vvir;
+
+  /*! The number of previous snapshots (hence the number of "star formation bursts") to be considered for
+  the SN feedback. Set by the N_HISTORY_SNAPS; currently set to 5. */
   // If we are at snapshot < N_HISTORY_SNAPS-1 then only try to look back to snapshot 0
   int n_bursts = (snapshot >= N_HISTORY_SNAPS) ? N_HISTORY_SNAPS : snapshot;
 
-  // Loop through each of the last `N_HISTORY_SNAPS` recorded stellar mass
-  // bursts and calculate the amount of energy and mass that they will release
-  // in the current time step.
+  /* Loop through each of the last `N_HISTORY_SNAPS` recorded stellar mass bursts and calculate the amount
+  of energy and mass that they will release in the current time step. */
   for (int i_burst = 1; i_burst < n_bursts; i_burst++) {
     double m_stars = gal->NewStars[i_burst];
 
-    // Only need to do this if any stars formed in this history bin
+    /*! Only need to do this if any stars formed in this history bin. */
     if (m_stars > 1e-10) {
       double metallicity = calc_metallicity(m_stars, gal->NewMetals[i_burst]);
-      // Calculate recycled mass and metals by yield tables
+      
+      /*! Calculate recycled mass and metals by yield tables. */
       m_recycled += m_stars * get_recycling_fraction(i_burst, metallicity);
       new_metals += m_stars * get_metal_yield(i_burst, metallicity);
-      // Calculate SNII energy
+      
+      /*! Calculate SNII energy. */
       sn_energy += get_SN_energy(i_burst, metallicity) * m_stars;
     }
   }
 
+  /*! The mass that gets reheated due to the SN feedback. Calculated as reheat_efficiency times the SN_energy fraction.
+  Note that SN_energy contains m_stars. */
   m_reheat = calc_sn_reheat_eff(gal, snapshot) * sn_energy / get_total_SN_energy();
   sn_energy *= calc_sn_ejection_eff(gal, snapshot);
+  
+  /*! The maximum reheated mass is the available ColdGas component of the galaxy. */
   // We can only reheat as much gas as we have available.  Let's inforce this
   // now, to ensure that the maximal amount of available energy is used to
   // eject gas from the system.
@@ -226,7 +255,7 @@ void delayed_supernova_feedback(galaxy_t* gal, int snapshot)
   assert(m_recycled >= 0);
   assert(new_metals >= 0);
 
-  // how much mass is ejected due to this star formation episode?
+  /*! Calculate the mass ejected by this star formation episode. */
   if (!gal->ghost_flag)
     fof_Vvir = gal->Halo->FOFGroup->Vvir;
   else
@@ -234,19 +263,18 @@ void delayed_supernova_feedback(galaxy_t* gal, int snapshot)
 
   m_eject = calc_ejected_mass(&m_reheat, sn_energy, gal->Vvir, fof_Vvir);
 
-  // Note that m_eject returned for ghosts by calc_ejected_mass() is
-  // meaningless in the current physical prescriptions.  This fact is dealt
-  // with in update_reservoirs_from_sn_feedback().
+  /*! Note that m_eject returned for ghosts by calc_ejected_mass() is meaningless in the
+  current physical prescriptions.  This fact is dealt with in update_reservoirs_from_sn_feedback(). */
 
   assert(m_reheat >= 0);
   assert(m_eject >= 0);
 
-  // update the baryonic reservoirs
+  /*! Update the baryonic reservoirs. */
   update_reservoirs_from_sn_feedback(gal, m_reheat, m_eject, m_recycled, new_metals);
 }
 
 /**
- * @brief Effects the SN feedback as spread over a snapshot
+ * @brief Effects the SN feedback from the current snapshot.
  * 
  * @param gal The galaxy for which the star formation is to be calculated.
  * @param m_stars Stellar mass produced in this burst of star formation.
