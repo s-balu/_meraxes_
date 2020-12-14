@@ -14,7 +14,7 @@
  * @brief  Evolves the galaxies forward in time.
  *
  * @param fof_group The fof struct that contains all the FoF groups in the simulation.
- * @param snapshot The snapshot value at which the galaxies's evolution are to be computed.
+ * @param snapshot The snapshot value at which the galaxies's evolution is to be computed.
  * @param NGal Total number of galaxies currently exist in the simulation.
  * @param Nfof Number of FoF groups.
  */
