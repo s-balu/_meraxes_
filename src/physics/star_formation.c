@@ -93,7 +93,7 @@ void update_reservoirs_from_sf(galaxy_t* gal, double new_stars, int snapshot, SF
  */
 void insitu_star_formation(galaxy_t* gal, int snapshot)
 {
-  /*! there is no point doing anything if there is no cold gas! */
+  /*! There is no point doing anything if there is no cold gas! */
   if (gal->ColdGas > 1e-10) {
     double r_disk;
     double v_disk;
@@ -170,9 +170,10 @@ void insitu_star_formation(galaxy_t* gal, int snapshot)
     if (m_stars > gal->ColdGas)
       m_stars = gal->ColdGas;
 
-    /*! calculate the total supernova feedback which would occur if this star
+    /*! Calculate the total supernova feedback which would occur if this star
      formation happened continuously and evenly throughout the snapshot */
     contemporaneous_supernova_feedback(gal, &m_stars, snapshot, &m_reheat, &m_eject, &m_recycled, &new_metals);
+    
     /*! update the baryonic reservoirs (note that the order we do this in will change the result!) */
     update_reservoirs_from_sf(gal, m_stars, snapshot, INSITU);
     update_reservoirs_from_sn_feedback(gal, m_reheat, m_eject, m_recycled, new_metals);

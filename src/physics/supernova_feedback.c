@@ -245,6 +245,17 @@ void delayed_supernova_feedback(galaxy_t* gal, int snapshot)
   update_reservoirs_from_sn_feedback(gal, m_reheat, m_eject, m_recycled, new_metals);
 }
 
+/**
+ * @brief Effects the SN feedback as spread over a snapshot
+ * 
+ * @param gal The galaxy for which the star formation is to be calculated.
+ * @param m_stars Stellar mass produced in this burst of star formation.
+ * @param snapshot The snapshot at which star formation occurs.
+ * @param m_reheat
+ * @param m_eject
+ * @param m_recycled
+ * @param new_metals
+ */
 void contemporaneous_supernova_feedback(galaxy_t* gal,
                                         double* m_stars,
                                         int snapshot,
@@ -278,6 +289,7 @@ void contemporaneous_supernova_feedback(galaxy_t* gal,
     *m_recycled = *m_stars * run_globals.params.physics.SfRecycleFraction;
     *new_metals = *m_stars * run_globals.params.physics.Yield;
   }
+  
   // calculate the SNII energy and total reheated mass
   sn_energy = *m_stars * get_SN_energy(0, metallicity);
   *m_reheat = calc_sn_reheat_eff(gal, snapshot) * sn_energy / get_total_SN_energy();
