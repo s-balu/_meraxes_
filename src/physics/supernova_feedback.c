@@ -201,9 +201,11 @@ static inline double calc_sn_ejection_eff(galaxy_t* gal, int snapshot)
 }
 
 /**
- * @brief  Effects the delayed SuperNova feedback.
+ * @brief  Effects the delayed SuperNova feedback from previous snapshots.
  * 
  * The SN feedback is assumed to be spread over the snapshot instead of an instantaneous one.
+ * Note that this function computes the SN feedback for the starformation in the last N_HISTORY_SNAPS snapshots.
+ * In contrast to the contemporaneous_supernova_feedback() which does the SN feedback for the current snapshot.
  * @param gal The galaxy for which the SN feedback is calculated.
  * @param snapshot The snapshot value at which the SN feedback is to be computed.
  */
@@ -276,6 +278,9 @@ void delayed_supernova_feedback(galaxy_t* gal, int snapshot)
 /**
  * @brief Effects the SN feedback from the current snapshot.
  * 
+ * Note that this function computes the SN feedback for the starformation in the
+ * current snapshot. In contrast to the delayed_supernova_feedback() which does the SN
+ * feedback for the previous snapshots.
  * @param gal The galaxy for which the star formation is to be calculated.
  * @param m_stars Stellar mass produced in this burst of star formation.
  * @param snapshot The snapshot at which star formation occurs.
