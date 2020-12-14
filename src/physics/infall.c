@@ -16,10 +16,11 @@
  */
 double gas_infall(fof_group_t* FOFgroup, int snapshot)
 {
+  /*! The main halo of the FoF group. */
   halo_t* halo = FOFgroup->FirstHalo;
 
   galaxy_t* gal;
-  /*! To store details about the central galaxy. This is the galaxy in the main halo of an FoF group*/
+  /*! To store details about the central galaxy. This is the galaxy in the main halo of an FoF group. */
   galaxy_t* central;
 
   double total_baryons = 0.;
@@ -27,6 +28,7 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
   /*! The mass of the infalling gas that remains bound to the FoFgroup and participate in galaxy formation. */
   double infall_mass = 0.;
   
+  /*! Virial mass. */
   double FOF_Mvir = FOFgroup->Mvir;
   double FOFMvirModifier = FOFgroup->FOFMvirModifier;
   

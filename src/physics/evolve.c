@@ -21,26 +21,26 @@
 //! Evolve existing galaxies forward in time
 int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
 {
-  /*! galaxy struct to store the galaxy properties */
+  /*! galaxy struct to store the galaxy properties. */
   galaxy_t* gal = NULL;
 
-  /*! halo_t struct to store the halo properties */
+  /*! halo_t struct to store the halo properties. */
   halo_t* halo = NULL;
   
-  /*! Number of galaxies in the simulation */
+  /*! Number of galaxies in the simulation. */
   int gal_counter = 0;
 
-  /*! Number of dead galaxies */
+  /*! Number of dead galaxies. */
   int dead_gals = 0;
 
   /*! Mass of the infalling gas that is to be added to the FoF group. This mass is assumed to be shocked to the virial
-  temperature of the host FoF group */
+  temperature of the host FoF group. */
   double infalling_gas = 0;
   
-  /*! The mass that cools down from the HotGas to the ColdGas */ 
+  /*! The mass that cools down from the HotGas to the ColdGas. */ 
   double cooling_mass = 0;
   
-  /*! The number of steps that you need to hop from one snapshot to the next. Currently  NSteps = 1 ALWAYS */
+  /*! The number of steps that you need to hop from one snapshot to the next. Currently  NSteps = 1 ALWAYS. */
   int NSteps = run_globals.params.NSteps;
   
   /*! Whether Instantaneous Recycling Approximation is enabled or not. 
@@ -51,7 +51,8 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
   // pre-calculate feedback tables for each lookback snapshot
   compute_stellar_feedback_tables(snapshot);
 
-  /*! Loop over all the structures in the present snapshot. The hierarchy is FoF Group -> Haloes -> Galaxies */
+  /*! Loop over all the FoF groups in the snapshot. Loops over all the structures in the present snapshot.
+  The hierarchy is FoF Group -> Haloes -> Galaxies */
   for (int i_fof = 0; i_fof < NFof; i_fof++) {
 
     /*! Skip to the next FoF group if there is no halo present */
@@ -68,7 +69,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
         gal = halo->Galaxy;
         
         /* Cycle through all the galaxies in the present halo. Depending on the Type of the galaxy, different
-        physics are implemented. There are currently four types of galaxies that are taken into account:
+        physics are implemented. There are currently four types of galaxies that are tracked:
         Type 0 : Central galaxy
         Type 1 : Satellite galaxy
         Type 2 : Halo-less galaxy
