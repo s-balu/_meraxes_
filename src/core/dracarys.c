@@ -317,7 +317,7 @@ void dracarys()
 
       if (check_if_reionization_ongoing(snapshot)) {
         if (!run_globals.params.ReionUVBFlag) {
-          // We are decoupled, so no need to run 21cmFAST unless we are ouputing this snapshot
+          // We are decoupled, so no need to run 21cmFAST unless we are outputing this snapshot
           for (int i_out = 0; i_out < NOutputSnaps; i_out++) {
             if (snapshot == run_globals.ListOutputSnaps[i_out]) {
               call_find_HII_bubbles(snapshot, nout_gals, &timer);
