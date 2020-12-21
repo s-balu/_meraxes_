@@ -331,7 +331,9 @@ void dracarys()
               }
             }
           }
-        } else {
+        } 
+        else 
+        {
 
           if (run_globals.params.Flag_IncludeSpinTemp) {
             call_ComputeTs(snapshot, nout_gals, &timer);
