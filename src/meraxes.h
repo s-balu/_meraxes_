@@ -196,14 +196,15 @@ typedef struct run_params_t
 
   physics_params_t physics;
   
-  /*! Size of the simulation box */
+  /*! Size of the simulation box. */
   double BoxSize;
 
   double VolumeFactor;
   
-  /*! Reduced Hubble parameter h = H/100 (km s-1 Mpc-1) */
+  /*! Reduced Hubble parameter h = H/100 (km s-1 Mpc-1). */
   double Hubble_h;
 
+  /*! Ratio of baryons' density to the total mass density  of the Universe; Omega_b/OmegaM. */
   double BaryonFrac;
   
   /*! Matter (BM + DM) density parameter */
@@ -218,7 +219,7 @@ typedef struct run_params_t
   /*! Cosmological constant density parameter */ 
   double OmegaLambda;
 
-  /*! Root-mean-square matter fluctuation averaged over a sphere of radius 8h–1 Mpc */
+  /*! Root-mean-square matter fluctuation averaged over a sphere of radius 8 h–1 Mpc */
   double Sigma8;
 
   double wLambda;

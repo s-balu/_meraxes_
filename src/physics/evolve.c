@@ -72,8 +72,9 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
         physics are implemented. There are currently four types of galaxies that are tracked:
         Type 0 : Central galaxy
         Type 1 : Satellite galaxy
-        Type 2 : Halo-less galaxy
-        Type 3 : Dead galaxy
+        Type 2 : Halo-less galaxy: The halo of this galaxy has merged with a bigger halo. Also known
+                            as Ghost galaxies. Becomes a Type3 galaxy once the mereger clock runs out.
+        Type 3 : Dead galaxy: The galaxy has merged to the central galaxy. Type2 evolves into these.
         */
         while (gal != NULL) {
           
