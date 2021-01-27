@@ -25,8 +25,7 @@ double gas_cooling(galaxy_t* gal)
   if (gal->HotGas > 1e-10) {
     fof_group_t* fof_group = gal->Halo->FOFGroup;
 
-    /*! Calculate the halo virial temperature T_vir. */
-    // N.B. This assumes ionised gas with mu=0.59...
+    /*! Calculate the halo virial temperature T_vir. N.B. This assumes ionised gas with mu=0.59... */
     double Tvir = 35.9 * fof_group->Vvir * fof_group->Vvir; // internal units (Kelvin)
 
     /*! There is no cooling if we are below 10^4 K */
@@ -45,14 +44,13 @@ double gas_cooling(galaxy_t* gal)
       else
         logZ = -10.0;
 
-      // interpolate the temperature and metallicity dependant cooling rate (lambda)
-      /*! lambda(T,Z) is the cooling function. Based on Sutherland & Dopita 1993 */
+      /*! Interpolate the temperature and metallicity dependant cooling rate funtion lambda(T,Z).
+      Based on Sutherland & Dopita 1993 */
       lambda = interpolate_cooling_rate(log10(Tvir), logZ);
 
-      // following equation (3) of Croton+ 2006, calculate the hot gas density at
-      // the radius r_cool (i.e. where the cooling time is equal to `t_cool`
-      // above)
-      /*! From the eq. 2 of DRAGONS3. Instead of solving for t_cool, we have found the rho_hot value */ 
+      /*! Following equation (3) of Croton+ 2006, calculate the hot gas density at
+      the radius r_cool (i.e. where the cooling time is equal to `t_cool` above).
+      (From the eq. 2 of DRAGONS3. Instead of solving for t_cool, we have found the rho_hot value) */ 
       x = PROTONMASS * BOLTZMANN * Tvir / lambda;              // now this has units sec g/cm^3
       x /= (units->UnitDensity_in_cgs * units->UnitTime_in_s); // now in internal units
       rho_r_cool = x / t_cool * 0.885;                         // 0.885 = 3/2 * mu, mu=0.59 for a fully ionized gas
@@ -69,13 +67,13 @@ double gas_cooling(galaxy_t* gal)
 
       /*! The maximum amount of gas we can possibly cool is limited by the amount of mass within the free fall radius */
       
-      /*! dt is gives the time difference when the halo and hence the galaxy was identified. Multiply by this factor
+      /*! dt gives the time difference between when the halo (and hence the galaxy) was identified. Multiply by this factor
       as a kind of linear approximation to find the cooling mass.*/
       max_cooling_mass = max_cooling_mass_factor * gal->HotGas / t_cool * gal->dt;
       
-      /*! Cases i & ii in Section 2.3 of DRAGONS3 */
+      /*! Cases i & ii in Section 2.3 of DRAGONS3. */
       if (r_cool > fof_group->Rvir)
-        /*! here we are in the rapid cooling regime and we accrete all gas within the free-fall radius */
+        /*! Here we are in the rapid cooling regime and we accrete all gas within the free-fall radius */
         cooling_mass = max_cooling_mass;
       // cooling_mass = gal->HotGas;
       else {

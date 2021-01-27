@@ -11,14 +11,13 @@
 #include "supernova_feedback.h"
 
 /**
- * @brief  Evolves the galaxies forward in time.
+ * @brief  Evolves the existing galaxies forward in time.
  *
  * @param fof_group The fof struct that contains all the FoF groups in the simulation.
  * @param snapshot The snapshot value at which the galaxies's evolution is to be computed.
  * @param NGal Total number of galaxies currently exist in the simulation.
  * @param Nfof Number of FoF groups.
  */
-//! Evolve existing galaxies forward in time
 int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
 {
   /*! galaxy struct to store the galaxy properties. */
@@ -40,7 +39,7 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
   /*! The mass that cools down from the HotGas to the ColdGas. */ 
   double cooling_mass = 0;
   
-  /*! The number of steps that you need to hop from one snapshot to the next. Currently  NSteps = 1 ALWAYS. */
+  /*! The number of steps that you need to hop from one snapshot to the next. Currently NSteps = 1 ALWAYS. */
   int NSteps = run_globals.params.NSteps;
   
   /*! Whether Instantaneous Recycling Approximation is enabled or not. 
@@ -61,7 +60,8 @@ int evolve_galaxies(fof_group_t* fof_group, int snapshot, int NGal, int NFof)
       continue;
 
     infalling_gas = gas_infall(&(fof_group[i_fof]), snapshot);
-    
+
+    /*! This loop essentially runs only once since NSteps = 1. !!! */
     for (int i_step = 0; i_step < NSteps; i_step++) {
       halo = fof_group[i_fof].FirstHalo;
       /* Start with the central halo and go "down" in the halo structure of an FoF group */
