@@ -43,7 +43,7 @@ void reincorporate_ejected_gas(galaxy_t* gal)
 
     switch (ReincorporationModel) {
       case 1:
-        /*! Allow some of the ejected gas associated with the central to be reincorporated
+        /*! Allow some of the ejected gas associated with the central galaxy to be reincorporated
         following the prescription of Guo 2010 (which is actually almost identical to SAGE). */
         reincorporated = ReincorporationEff * gal->EjectedGas * (gal->dt / t_dyn);
         break;

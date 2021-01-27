@@ -23,6 +23,7 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
   /*! To store details about the central galaxy. This is the galaxy in the main halo of an FoF group. */
   galaxy_t* central;
 
+  /*! The total baryon mass in the entire FOF group. */
   double total_baryons = 0.;
   
   /*! The mass of the infalling gas that remains bound to the FoFgroup and participate in galaxy formation. */
@@ -91,9 +92,11 @@ double gas_infall(fof_group_t* FOFgroup, int snapshot)
   // fraction of this halo.
   /*! ??? */
   fb_modifier = reionization_modifier(central, FOF_Mvir, snapshot);
+  
   if (run_globals.RequestedBaryonFracModifier == 1)
     fb_modifier *= interpolate_modifier(run_globals.baryon_frac_modifier,
                                         log10(FOF_Mvir / FOFMvirModifier / run_globals.params.Hubble_h) + 10.0);
+
   /*! DRAGONS3 eq. 1. BaryonFrac is the universal baryonic fraction f_b = Omega_b / Omega_m */
   infall_mass = fb_modifier * run_globals.params.BaryonFrac * FOF_Mvir - total_baryons;
 
