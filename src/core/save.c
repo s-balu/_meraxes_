@@ -590,12 +590,8 @@ void create_master_file()
             group_id = H5Gcreate(file_id, group_name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
             H5LTset_attribute_string(file_id, group_name, "xH", "None");
             H5LTset_attribute_string(file_id, group_name, "J_21", "10e-21 erg/s/Hz/cm/cm/sr");
-            H5LTset_attribute_string(file_id, group_name, "J_21_at_ionization", "10e-21 erg/s/Hz/cm/cm/sr");
-            H5LTset_attribute_string(file_id, group_name, "z_at_ionization", "None");
             H5LTset_attribute_string(file_id, group_name, "r_bubble", "Mpc");
             H5LTset_attribute_string(file_id, group_name, "Mvir_crit", "1e10 solMass");
-            H5LTset_attribute_string(file_id, group_name, "StellarMass", "1e10 solMass");
-            H5LTset_attribute_string(file_id, group_name, "Sfr", "solMass/yr");
             H5LTset_attribute_string(file_id, group_name, "deltax", "None");
 
             if(run_globals.params.Flag_ConstructLightcone) {
@@ -625,12 +621,8 @@ void create_master_file()
             group_id = H5Gcreate(file_id, group_name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
             H5LTset_attribute_string(file_id, group_name, "xH", "None");
             H5LTset_attribute_string(file_id, group_name, "J_21", "v*(h**2)");
-            H5LTset_attribute_string(file_id, group_name, "J_21_at_ionization", "v*(h**2)");
-            H5LTset_attribute_string(file_id, group_name, "z_at_ionization", "None");
             H5LTset_attribute_string(file_id, group_name, "r_bubble", "v/h");
             H5LTset_attribute_string(file_id, group_name, "Mvir_crit", "v/h");
-            H5LTset_attribute_string(file_id, group_name, "StellarMass", "v/h");
-            H5LTset_attribute_string(file_id, group_name, "Sfr", "None");
             H5LTset_attribute_string(file_id, group_name, "deltax", "None");
 
             if(run_globals.params.Flag_ConstructLightcone) {

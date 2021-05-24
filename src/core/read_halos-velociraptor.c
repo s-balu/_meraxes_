@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <hdf5_hl.h>
 #include <math.h>
+#include <limits.h>
 
 trees_info_t read_trees_info__velociraptor(const int snapshot)
 {
@@ -218,7 +219,13 @@ void read_trees__velociraptor(int snapshot, halo_t* halos, int* n_halos, fof_gro
     size_t _nbytes = sizeof(tree_entry_t) * n_tree_entries;
     if (run_globals.mpi_rank > 0)
         tree_entries = malloc(_nbytes);
-    MPI_Bcast(tree_entries, (int)_nbytes, MPI_BYTE, 0, run_globals.mpi_comm);
+    void* bcast_buffer = (void*)tree_entries;
+    while (_nbytes > INT_MAX) {
+        MPI_Bcast(bcast_buffer, INT_MAX, MPI_BYTE, 0, run_globals.mpi_comm);
+        bcast_buffer += INT_MAX;
+        _nbytes -= INT_MAX;
+    }
+    MPI_Bcast(bcast_buffer, (int)_nbytes, MPI_BYTE, 0, run_globals.mpi_comm);
 
     *n_halos = 0;
     *n_fof_groups = 0;
@@ -266,8 +273,8 @@ void read_trees__velociraptor(int snapshot, halo_t* halos, int* n_halos, fof_gro
                 fof_group_t* fof_group = &fof_groups[*n_fof_groups];
 
                 // TODO: What masses and radii should I use for centrals (inclusive vs. exclusive etc.)?
-                fof_group->Mvir = tree_entry.Mass_200crit;
-                fof_group->Rvir = tree_entry.R_200crit;
+                fof_group->Mvir = tree_entry.Mass_tot;
+                fof_group->Rvir = -1;
                 fof_group->Vvir = -1;
                 fof_group->FOFMvirModifier = 1.0;
 

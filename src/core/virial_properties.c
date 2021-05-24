@@ -101,7 +101,7 @@ double calculate_Rvir(double Mvir, int snapshot)
 
     rhocrit = 3 * hubble_of_z_sq / (8 * M_PI * run_globals.G);
 
-    Delta = Delta_vir(run_globals.ZZ[snapshot]);
+    Delta = 200; //Delta_vir(run_globals.ZZ[snapshot]);
 
     fac = 1 / (Delta * 4 * M_PI / 3.0 * rhocrit);
 

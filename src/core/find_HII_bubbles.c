@@ -2,6 +2,8 @@
 #include <fftw3-mpi.h>
 #include <math.h>
 
+// DEBUG
+
 #include "recombinations.c"
 
 /*

@@ -11,7 +11,7 @@ int main(int argc, char** argv)
     MPI_Comm_size(MPI_COMM_WORLD, &run_globals.mpi_size);
 
     // init mlog
-    init_mlog(MPI_COMM_WORLD, stdout, stdout, stderr);
+    init_mlog(MPI_COMM_WORLD, stderr, stderr, stderr);
 
     struct stat filestatus;
 
