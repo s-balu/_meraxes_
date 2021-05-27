@@ -38,6 +38,9 @@ src/build*
 src/local.cmake
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 src/.clangd/
 src/compile_commands.json
+=======
+>>>>>>> e87388d851610129b0a7296b586df2484ebb323f
 src/.vscode
