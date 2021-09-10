@@ -308,7 +308,7 @@ void read_trees__velociraptor(int snapshot,
             // proxy masses, but flag this fact so we know not to do
             // any or allow any hot halo to exist.
             halo->TreeFlags |= TREE_CASE_BELOW_VIRIAL_THRESHOLD;
-            fof_group->Mvir = tree_entry.tot;
+            fof_group->Mvir = tree_entry.Mass_tot;
             fof_group->Rvir = -1;
             // } else if (tree_entry.Mass_200crit < tree_entry.Mass_tot){
             // // The central subhalo has a proxy mass larger than the FOF
