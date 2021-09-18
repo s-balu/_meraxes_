@@ -59,7 +59,7 @@ static int id_to_snap(long id)
 inline static void convert_input_virial_props(double* Mvir,
                                               double* Rvir,
                                               double* Vvir,
-                                              double* FOFMvirModifier,
+//                                              double* FOFMvirModifier,
                                               const int len,
                                               const int snapshot,
                                               const bool fof_flag)
@@ -69,13 +69,13 @@ inline static void convert_input_virial_props(double* Mvir,
     assert(len > 0);
     *Mvir = calculate_Mvir(*Mvir, len);
   } else {
-    if (fof_flag && (run_globals.RequestedMassRatioModifier == 1)) {
+    /*if (fof_flag && (run_globals.RequestedMassRatioModifier == 1)) {
       // Modifier the FoF mass and update the virial radius
       assert(FOFMvirModifier != NULL);
       *FOFMvirModifier =
         interpolate_modifier(run_globals.mass_ratio_modifier, log10(*Mvir / run_globals.params.Hubble_h) + 10.0);
       *Mvir *= *FOFMvirModifier;
-    }
+    }*/
   }
 
   if (*Rvir == -1)
@@ -323,10 +323,11 @@ void read_trees__velociraptor(int snapshot,
             fof_group->Rvir = tree_entry.R_200crit;
           }
           fof_group->Vvir = -1;
-          fof_group->FOFMvirModifier = 1.0;
+//          fof_group->FOFMvirModifier = 1.0;
 
           convert_input_virial_props(
-            &fof_group->Mvir, &fof_group->Rvir, &fof_group->Vvir, &fof_group->FOFMvirModifier, -1, snapshot, true);
+            &fof_group->Mvir, &fof_group->Rvir, &fof_group->Vvir, -1, snapshot, true);
+            //&fof_group->Mvir, &fof_group->Rvir, &fof_group->Vvir, &fof_group->FOFMvirModifier, -1, snapshot, true);
 
           halo->FOFGroup = &(fof_groups[*n_fof_groups]);
           fof_groups[(*n_fof_groups)++].FirstHalo = halo;
@@ -364,7 +365,8 @@ void read_trees__velociraptor(int snapshot,
         halo->Mvir = tree_entry.Mass_tot;
         halo->Rvir = -1;
         halo->Vvir = -1;
-        convert_input_virial_props(&halo->Mvir, &halo->Rvir, &halo->Vvir, NULL, -1, snapshot, false);
+        //convert_input_virial_props(&halo->Mvir, &halo->Rvir, &halo->Vvir, NULL, -1, snapshot, false);
+        convert_input_virial_props(&halo->Mvir, &halo->Rvir, &halo->Vvir, -1, snapshot, false);
 
         halo->AngMom[0] = (float)(tree_entry.Lx / tree_entry.Mass_tot);
         halo->AngMom[1] = (float)(tree_entry.Ly / tree_entry.Mass_tot);

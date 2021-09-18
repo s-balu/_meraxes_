@@ -32,36 +32,36 @@ typedef struct galaxy_output_t
 
   // baryonic reservoirs
   float HotGas;
-  float MetalsHotGas;
+//  float MetalsHotGas;
   float ColdGas;
-  float MetalsColdGas;
-  float H2Frac;
-  float H2Mass;
-  float HIMass;
-  float Mcool;
-  float DiskScaleLength;
+//  float MetalsColdGas;
+  //float H2Frac;
+  //float H2Mass;
+  //float HIMass;
+//  float Mcool;
+  //float DiskScaleLength;
   float StellarMass;
-  float GrossStellarMass;
+//  float GrossStellarMass;
   float Fesc;
   float FescWeightedGSM;
-  float MetalsStellarMass;
+//  float MetalsStellarMass;
   float Sfr;
   float EjectedGas;
-  float MetalsEjectedGas;
+//  float MetalsEjectedGas;
   float BlackHoleMass;
-  float FescBH;
-  float BHemissivity;
-  float EffectiveBHM;
+  //float FescBH;
+//  float BHemissivity;
+//  float EffectiveBHM;
   float BlackHoleAccretedHotMass;
   float BlackHoleAccretedColdMass;
 
   // misc
-  float Rcool;
-  float Cos_Inc;
+//  float Rcool;
+//  float Cos_Inc;
   float MergTime;
-  float MergerStartRadius;
+ // float MergerStartRadius;
   float BaryonFracModifier;
-  float FOFMvirModifier;
+//  float FOFMvirModifier;
   float MvirCrit;
   float dt;
   float MergerBurstMass;

@@ -398,6 +398,7 @@ void get_output_magnitudes(float* mags, float* dusty_mags, galaxy_t* gal, int sn
   int* targetSnap = run_globals.mag_params.targetSnap;
   double* pInBCFlux = gal->inBCFlux;
   double* pOutBCFlux = gal->outBCFlux;
+  double sqrt_2 = 1.414213562;
 
   for (iS = 0; iS < MAGS_N_SNAPS; ++iS) {
     if (snapshot == targetSnap[iS])
@@ -418,7 +419,8 @@ void get_output_magnitudes(float* mags, float* dusty_mags, galaxy_t* gal, int sn
 
     // Best fit dust--gas model from Qiu, Mutch, da Cunha et al. 2019, MNRAS, 489, 1357
     double factor = pow(calc_metallicity(gal->ColdGas, gal->MetalsColdGas) / 0.02, 0.65) * gal->ColdGas *
-                    pow(gal->DiskScaleLength * 1e3, -2.0) * exp(-0.35 * redshift);
+                    pow(gal->Spin * gal->Rvir / sqrt_2 * 1e3, -2.0) * exp(-0.35 * redshift);
+                    //pow(gal->DiskScaleLength * 1e3, -2.0) * exp(-0.35 * redshift);
     dust_params_t dust_params = { .tauUV_ISM = 13.5 * factor,
                                   .nISM = -1.6,
                                   .tauUV_BC = 381.3 * factor,

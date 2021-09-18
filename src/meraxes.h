@@ -422,45 +422,45 @@ typedef struct galaxy_t
   double MetalsHotGas;
   double ColdGas;
   double MetalsColdGas;
-  double H2Frac;
-  double H2Mass;
-  double HIMass;
-  double Mcool;
+  //double H2Frac;
+  //double H2Mass;
+  //double HIMass;
+  //double Mcool;
   double StellarMass;
-  double GrossStellarMass;
+ // double GrossStellarMass;
   double Fesc;
   double FescWeightedGSM;
   double MetalsStellarMass;
-  double DiskScaleLength;
+  //double DiskScaleLength;
   double Sfr;
   double EjectedGas;
   double MetalsEjectedGas;
   double BlackHoleMass;
-  double FescBH;
-  double BHemissivity;
-  double EffectiveBHM;
+//  double FescBH;
+ // double BHemissivity;
+ // double EffectiveBHM;
   double BlackHoleAccretedHotMass;
   double BlackHoleAccretedColdMass;
   double BlackHoleAccretingColdMass;
 
   // baryonic hostories
-  double mwmsa_num;
-  double mwmsa_denom;
+//  double mwmsa_num;
+//  double mwmsa_denom;
 
   // misc
-  double Rcool;
-  double Cos_Inc;
+//  double Rcool;
+//  double Cos_Inc;
   double MergTime;
-  double MergerStartRadius;
+//  double MergerStartRadius;
   double BaryonFracModifier;
-  double FOFMvirModifier;
+//  double FOFMvirModifier;
   double MvirCrit;
   double MergerBurstMass;
 
   int Type;
   int OldType;
   int Len;
-  int MaxLen;
+  //int MaxLen;
   int SnapSkipCounter;
   int HaloDescIndex;
   int TreeFlags;
@@ -505,7 +505,7 @@ typedef struct fof_group_t
   double Mvir;
   double Rvir;
   double Vvir;
-  double FOFMvirModifier;
+//  double FOFMvirModifier;
   int TotalSubhaloLen;
 } fof_group_t;
 

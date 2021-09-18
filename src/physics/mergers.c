@@ -99,7 +99,7 @@ double calculate_merging_time(galaxy_t* orphan, int snapshot)
   sat_rad /= (1 + run_globals.ZZ[snapshot - 1]);
 
   // TODO: Should this be parent or mother???
-  orphan->MergerStartRadius = sat_rad / mother->Rvir;
+//  orphan->MergerStartRadius = sat_rad / mother->Rvir;
 
   if (sat_rad > mother->Rvir)
     sat_rad = mother->Rvir;
@@ -165,7 +165,7 @@ void merge_with_target(galaxy_t* gal, int* dead_gals, int snapshot)
 
   // Add galaxies together
   parent->StellarMass += gal->StellarMass;
-  parent->GrossStellarMass += gal->GrossStellarMass;
+  //parent->GrossStellarMass += gal->GrossStellarMass;
   parent->FescWeightedGSM += gal->FescWeightedGSM;
   parent->MetalsStellarMass += gal->MetalsStellarMass;
   parent->Sfr += gal->Sfr;
@@ -178,11 +178,11 @@ void merge_with_target(galaxy_t* gal, int* dead_gals, int snapshot)
   parent->BlackHoleAccretedHotMass += gal->BlackHoleAccretedHotMass;
   parent->BlackHoleAccretedColdMass += gal->BlackHoleAccretedColdMass;
   parent->BlackHoleAccretingColdMass += gal->BlackHoleAccretingColdMass;
-  parent->BHemissivity += gal->BHemissivity;
+//  parent->BHemissivity += gal->BHemissivity;
   parent->BlackHoleMass += gal->BlackHoleMass;
-  parent->EffectiveBHM += gal->EffectiveBHM;
-  parent->mwmsa_num += gal->mwmsa_num;
-  parent->mwmsa_denom += gal->mwmsa_denom;
+//  parent->EffectiveBHM += gal->EffectiveBHM;
+//  parent->mwmsa_num += gal->mwmsa_num;
+//  parent->mwmsa_denom += gal->mwmsa_denom;
   parent->MergerBurstMass += gal->MergerBurstMass;
 
   for (int ii = 0; ii < N_HISTORY_SNAPS; ii++)

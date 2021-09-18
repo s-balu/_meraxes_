@@ -25,47 +25,47 @@ galaxy_t* new_galaxy(int snapshot, unsigned long halo_ID)
   gal->Next = NULL;
   gal->MergerTarget = NULL;
   gal->Len = 0;
-  gal->MaxLen = 0;
+  //gal->MaxLen = 0;
   gal->dt = 0.0;
   gal->Mvir = 0.0;
   gal->Rvir = 0.0;
   gal->Vvir = 0.0;
   gal->Vmax = 0.0;
   gal->Spin = 0.0;
-  gal->DiskScaleLength = 0.0;
+  //gal->DiskScaleLength = 0.0;
   gal->HotGas = 0.0;
   gal->MetalsHotGas = 0.0;
   gal->ColdGas = 0.0;
   gal->MetalsColdGas = 0.0;
-  gal->H2Frac = 0.0;
-  gal->H2Mass = 0.0;
-  gal->HIMass = 0.0;
+  //gal->H2Frac = 0.0;
+  //gal->H2Mass = 0.0;
+  //gal->HIMass = 0.0;
   gal->EjectedGas = 0.0;
   gal->MetalsEjectedGas = 0.0;
-  gal->Mcool = 0.0;
-  gal->Rcool = 0.0;
+  //gal->Mcool = 0.0;
+//  gal->Rcool = 0.0;
   gal->StellarMass = 0.0;
-  gal->GrossStellarMass = 0.0;
+  //gal->GrossStellarMass = 0.0;
   gal->Fesc = 1.0;
   gal->FescWeightedGSM = 0.0;
   gal->MetalsStellarMass = 0.0;
-  gal->mwmsa_num = 0.0;
-  gal->mwmsa_denom = 0.0;
+  //gal->mwmsa_num = 0.0;
+  //gal->mwmsa_denom = 0.0;
   gal->BlackHoleMass = run_globals.params.physics.BlackHoleSeed;
-  gal->FescBH = 1.0;
-  gal->BHemissivity = 0.0;
-  gal->EffectiveBHM = 0.0;
+  //gal->FescBH = 1.0;
+  //gal->BHemissivity = 0.0;
+//  gal->EffectiveBHM = 0.0;
   gal->BlackHoleAccretedHotMass = 0.0;
   gal->BlackHoleAccretedColdMass = 0.0;
   gal->BlackHoleAccretingColdMass = 0.0;
   gal->Sfr = 0.0;
-  gal->Cos_Inc = gsl_rng_uniform(run_globals.random_generator);
+//  gal->Cos_Inc = gsl_rng_uniform(run_globals.random_generator);
   gal->MergTime = 99999.9;
   gal->BaryonFracModifier = 1.0;
-  gal->FOFMvirModifier = 1.0;
+//  gal->FOFMvirModifier = 1.0;
   gal->MvirCrit = 0.0;
   gal->MergerBurstMass = 0.0;
-  gal->MergerStartRadius = 0.0;
+ // gal->MergerStartRadius = 0.0;
 
   for (int ii = 0; ii < 3; ii++) {
     gal->Pos[ii] = (float)-99999.9;
@@ -99,17 +99,17 @@ void copy_halo_props_to_galaxy(halo_t* halo, galaxy_t* gal)
   gal->Vvir = halo->Vvir;
   gal->TreeFlags = halo->TreeFlags;
   gal->Spin = calculate_spin_param(halo);
-  gal->FOFMvirModifier = halo->FOFGroup->FOFMvirModifier;
+//  gal->FOFMvirModifier = halo->FOFGroup->FOFMvirModifier;
 
   double sqrt_2 = 1.414213562;
   if (gal->Type == 0) {
     gal->Vmax = halo->Vmax;
-    gal->DiskScaleLength = gal->Spin * gal->Rvir / sqrt_2;
+//    gal->DiskScaleLength = gal->Spin * gal->Rvir / sqrt_2;
   } else {
     if (!run_globals.params.physics.Flag_FixVmaxOnInfall)
       gal->Vmax = halo->Vmax;
-    if (!run_globals.params.physics.Flag_FixDiskRadiusOnInfall)
-      gal->DiskScaleLength = gal->Spin * gal->Rvir / sqrt_2;
+//    if (!run_globals.params.physics.Flag_FixDiskRadiusOnInfall)
+//      gal->DiskScaleLength = gal->Spin * gal->Rvir / sqrt_2;
   }
 
   for (int ii = 0; ii < 3; ii++) {
@@ -118,8 +118,8 @@ void copy_halo_props_to_galaxy(halo_t* halo, galaxy_t* gal)
   }
 
   // record the maximum Len value if necessary
-  if (halo->Len > gal->MaxLen)
-    gal->MaxLen = halo->Len;
+//  if (halo->Len > gal->MaxLen)
+//    gal->MaxLen = halo->Len;
 }
 
 void reset_galaxy_properties(galaxy_t* gal, int snapshot)
@@ -127,12 +127,12 @@ void reset_galaxy_properties(galaxy_t* gal, int snapshot)
   // Here we reset any galaxy properties which are calculated on a snapshot by
   // snapshot basis.
   gal->Sfr = 0.0;
-  gal->Mcool = 0.0;
-  gal->Rcool = 0.0;
+  //gal->Mcool = 0.0;
+//  gal->Rcool = 0.0;
   gal->MvirCrit = 0.0;
-  gal->BHemissivity = 0.0;
+  //gal->BHemissivity = 0.0;
   gal->BaryonFracModifier = 1.0;
-  gal->FOFMvirModifier = 1.0;
+//  gal->FOFMvirModifier = 1.0;
   gal->BlackHoleAccretedHotMass = 0.0;
   gal->BlackHoleAccretedColdMass = 0.0;
 
@@ -140,10 +140,10 @@ void reset_galaxy_properties(galaxy_t* gal, int snapshot)
   // done for snapshots shich are passing out of what we are able to track
   // with N_HISTORY_SNAPS.
   assert(snapshot > 0);
-  if (snapshot >= N_HISTORY_SNAPS) {
-    gal->mwmsa_denom += gal->NewStars[N_HISTORY_SNAPS - 1];
-    gal->mwmsa_num += gal->NewStars[N_HISTORY_SNAPS - 1] * run_globals.LTTime[snapshot - N_HISTORY_SNAPS];
-  }
+  //if (snapshot >= N_HISTORY_SNAPS) {
+  //  gal->mwmsa_denom += gal->NewStars[N_HISTORY_SNAPS - 1];
+  //  gal->mwmsa_num += gal->NewStars[N_HISTORY_SNAPS - 1] * run_globals.LTTime[snapshot - N_HISTORY_SNAPS];
+ // }
 
   // roll over the baryonic history arrays
   for (int ii = N_HISTORY_SNAPS - 1; ii > 0; ii--)

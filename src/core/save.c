@@ -8,7 +8,7 @@
 #include "reionization.h"
 #include "save.h"
 
-static float current_mwmsa(galaxy_t* gal, int i_snap)
+/*static float current_mwmsa(galaxy_t* gal, int i_snap)
 {
   double* LTTime = run_globals.LTTime;
   double mwmsa_num = gal->mwmsa_num;
@@ -21,7 +21,7 @@ static float current_mwmsa(galaxy_t* gal, int i_snap)
   }
 
   return (float)((mwmsa_num / mwmsa_denom) - LTTime[snapshot]);
-}
+}*/
 
 void prepare_galaxy_for_output(galaxy_t gal, galaxy_output_t* galout, int i_snap)
 {
@@ -53,13 +53,13 @@ void prepare_galaxy_for_output(galaxy_t gal, galaxy_output_t* galout, int i_snap
   galout->Spin = (float)(gal.Spin);
   galout->HotGas = (float)(gal.HotGas);
   galout->ColdGas = (float)(gal.ColdGas);
-  galout->Mcool = (float)(gal.Mcool);
+//  galout->Mcool = (float)(gal.Mcool);
   galout->StellarMass = (float)(gal.StellarMass);
   galout->Fesc = (float)(gal.Fesc);
   galout->FescWeightedGSM = (float)(gal.FescWeightedGSM);
   galout->Sfr = (float)(gal.Sfr * units->UnitMass_in_g / units->UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS);
   galout->EjectedGas = (float)(gal.EjectedGas);
-  galout->Rcool = (float)(gal.Rcool);
+//  galout->Rcool = (float)(gal.Rcool);
   galout->BaryonFracModifier = (float)(gal.BaryonFracModifier);
   galout->MvirCrit = (float)(gal.MvirCrit);
   galout->dt = (float)(gal.dt * units->UnitTime_in_Megayears);
@@ -82,7 +82,7 @@ void calc_hdf5_props()
     galaxy_output_t galout;
     int i; // dummy
 
-    h5props->n_props = 27;
+    h5props->n_props = 25;
 
 #ifdef CALC_MAGS
     h5props->n_props += 2;
@@ -226,12 +226,12 @@ void calc_hdf5_props()
     h5props->field_h_conv[i] = "v/h";
     h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
-    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Mcool);
+/*    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Mcool);
     h5props->dst_field_sizes[i] = sizeof(galout.Mcool);
     h5props->field_names[i] = "Mcool";
     h5props->field_units[i] = "1e10 solMass";
     h5props->field_h_conv[i] = "v/h";
-    h5props->field_types[i++] = H5T_NATIVE_FLOAT;
+    h5props->field_types[i++] = H5T_NATIVE_FLOAT;*/
 
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, StellarMass);
     h5props->dst_field_sizes[i] = sizeof(galout.StellarMass);
@@ -270,12 +270,12 @@ void calc_hdf5_props()
     h5props->field_h_conv[i] = "v/h";
     h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
-    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Rcool);
+/*    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Rcool);
     h5props->dst_field_sizes[i] = sizeof(galout.Rcool);
     h5props->field_names[i] = "Rcool";
     h5props->field_units[i] = "Mpc"; // real
     h5props->field_h_conv[i] = "v/h";
-    h5props->field_types[i++] = H5T_NATIVE_FLOAT;
+    h5props->field_types[i++] = H5T_NATIVE_FLOAT;*/
 
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, BaryonFracModifier);
     h5props->dst_field_sizes[i] = sizeof(galout.BaryonFracModifier);
@@ -298,7 +298,6 @@ void calc_hdf5_props()
     h5props->field_h_conv[i] = "v/h";
     h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
-    // Blackhole or Emissivity related
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Fesc);
     h5props->dst_field_sizes[i] = sizeof(galout.Fesc);
     h5props->field_names[i] = "Fesc";
