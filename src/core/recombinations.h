@@ -33,35 +33,34 @@
 #define RR_DEL_lnGamma (float)(0.1)
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-  double alpha_A(double T);
-  double alpha_B(double T); // case B hydrogen recombination coefficient (Spitzer 1978) T in K
-  double neutral_fraction(double density,
-                          double T4,
-                          double gamma12,
-                          int usecaseB); // neutral fraction given H density (cm^-3), gas temperature (in 1e4 K), and
-                                         // gamma12  (in 1e-12 s^-1). if usecase B, then use case B, otherwise case A
-  double splined_recombination_rate(double z_eff, double gamma12_bg); // assumes T=1e4 and case B
-  double recombination_rate(double z_eff, double gamma12_bg, double T4, int usecaseB);
-  void init_MHR(); /*initializes the lookup table for the PDF density integral in MHR00 model at redshift z*/
-  void free_MHR(); /* deallocates the gsl structures from init_MHR */
-  double Gamma_SS(double Gamma_bg, double Delta, double T_4, double z); // ionization rate w. self shielding
-  double MHR_rr(double lnD, void* params);
-  double A_MHR(double z);            /*returns the A parameter in MHR00model*/
-  double C_MHR(double z);            /*returns the C parameter in MHR00model*/
-  double beta_MHR(double z);         /*returns the beta parameter in MHR00model*/
-  double splined_A_MHR(double z);    /*returns the splined A parameter in MHR00model*/
-  double splined_C_MHR(double z);    /*returns the splined C parameter in MHR00model*/
-  double splined_beta_MHR(double z); /*returns the splined beta parameter in MHR00*/
-  void free_A_MHR();                 /* deallocates the gsl structures from init_A */
-  void free_C_MHR();                 /* deallocates the gsl structures from init_C */
-  void free_beta_MHR();              /* deallocates the gsl structures from init_beta */
-  void init_A_MHR();                 /*initializes the lookup table for the A paremeter in MHR00 model*/
-  void init_C_MHR();                 /*initializes the lookup table for the C paremeter in MHR00 model*/
-  void init_beta_MHR();              /*initializes the lookup table for the beta paremeter in MHR00 model*/
+double alpha_A(double T);
+double alpha_B(double T); // case B hydrogen recombination coefficient (Spitzer 1978) T in K
+double neutral_fraction(double density,
+                        double T4,
+                        double gamma12,
+                        int usecaseB); // neutral fraction given H density (cm^-3), gas temperature (in 1e4 K), and
+                                       // gamma12  (in 1e-12 s^-1). if usecase B, then use case B, otherwise case A
+double splined_recombination_rate(double z_eff, double gamma12_bg); // assumes T=1e4 and case B
+double recombination_rate(double z_eff, double gamma12_bg, double T4, int usecaseB);
+void init_MHR(); /*initializes the lookup table for the PDF density integral in MHR00 model at redshift z*/
+void free_MHR(); /* deallocates the gsl structures from init_MHR */
+double Gamma_SS(double Gamma_bg, double Delta, double T_4, double z); // ionization rate w. self shielding
+double MHR_rr(double lnD, void* params);
+double A_MHR(double z);            /*returns the A parameter in MHR00model*/
+double C_MHR(double z);            /*returns the C parameter in MHR00model*/
+double beta_MHR(double z);         /*returns the beta parameter in MHR00model*/
+double splined_A_MHR(double z);    /*returns the splined A parameter in MHR00model*/
+double splined_C_MHR(double z);    /*returns the splined C parameter in MHR00model*/
+double splined_beta_MHR(double z); /*returns the splined beta parameter in MHR00*/
+void free_A_MHR();                 /* deallocates the gsl structures from init_A */
+void free_C_MHR();                 /* deallocates the gsl structures from init_C */
+void free_beta_MHR();              /* deallocates the gsl structures from init_beta */
+void init_A_MHR();                 /*initializes the lookup table for the A paremeter in MHR00 model*/
+void init_C_MHR();                 /*initializes the lookup table for the C paremeter in MHR00 model*/
+void init_beta_MHR();              /*initializes the lookup table for the beta paremeter in MHR00 model*/
 
 #ifdef __cplusplus
 }

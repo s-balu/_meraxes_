@@ -47,7 +47,7 @@ void update_reservoirs_from_sf(galaxy_t* gal, double new_stars, int snapshot, SF
     gal->ColdGas -= new_stars;
     gal->MetalsColdGas -= new_stars * metallicity;
     gal->StellarMass += new_stars;
-//    gal->GrossStellarMass += new_stars;
+    //    gal->GrossStellarMass += new_stars;
     gal->MetalsStellarMass += new_stars * metallicity;
 
     if ((type == INSITU) && !Flag_IRA && (gal->LastIdentSnap < (snapshot - 1))) {
@@ -56,7 +56,7 @@ void update_reservoirs_from_sf(galaxy_t* gal, double new_stars, int snapshot, SF
       // SF burst.
       backfill_ghost_star_formation(gal, new_stars, sfr, metallicity, snapshot);
     } else {
-      // update the stellar mass history assuming the burst is happening in this snapshot
+    // update the stellar mass history assuming the burst is happening in this snapshot
 #ifdef CALC_MAGS
       if (sfr > 0.)
         add_luminosities(&run_globals.mag_params, gal, snapshot, metallicity, sfr);
@@ -95,7 +95,7 @@ void insitu_star_formation(galaxy_t* gal, int snapshot)
 
     double zplus1;
     double zplus1_n;
-	double sqrt_2 = 1.414213562;
+    double sqrt_2 = 1.414213562;
 
     zplus1 = 1.0 + run_globals.ZZ[snapshot];
     zplus1_n = pow(zplus1, run_globals.params.physics.SfEfficiencyScaling);
@@ -122,7 +122,7 @@ void insitu_star_formation(galaxy_t* gal, int snapshot)
     // calculate disk scalelength using Mo, Mao & White (1998) eqn. 12 and
     // multiply it by 3 to approximate the star forming region size (ala
     // Croton+ 2006).
-    //r_disk = gal->DiskScaleLength * 3.0;
+    // r_disk = gal->DiskScaleLength * 3.0;
     r_disk = gal->Spin * gal->Rvir / sqrt_2 * 3.0;
 
     switch (SfPrescription) {
@@ -137,10 +137,10 @@ void insitu_star_formation(galaxy_t* gal, int snapshot)
           return;
         break;
 
-/*      case 2:
-        // f_h2 from Blitz & Rosolowski 2006 abd Bigiel+11 SF law
-        m_stars = pressure_dependent_star_formation(gal, snapshot) * gal->dt;
-        break;*/
+        /*      case 2:
+                // f_h2 from Blitz & Rosolowski 2006 abd Bigiel+11 SF law
+                m_stars = pressure_dependent_star_formation(gal, snapshot) * gal->dt;
+                break;*/
 
       case 3:
         // GALFORM
@@ -216,7 +216,7 @@ static double p_dependent_SFR(double lower_limit,
   return result;
 }
 
-//double pressure_dependent_star_formation(galaxy_t* gal, int snapshot)
+// double pressure_dependent_star_formation(galaxy_t* gal, int snapshot)
 //{
 //  /*
 //   * Credit: Hansik Kim

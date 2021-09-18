@@ -4,11 +4,10 @@
 #include "meraxes.h"
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-  void reincorporate_ejected_gas(struct galaxy_t* gal);
+void reincorporate_ejected_gas(struct galaxy_t* gal);
 
 #ifdef __cplusplus
 }

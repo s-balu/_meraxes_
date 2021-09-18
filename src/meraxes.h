@@ -45,10 +45,9 @@
 
 // Define things used for aborting exceptions
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
-  void myexit(int signum);
+void myexit(int signum);
 #ifdef __cplusplus
 }
 #endif
@@ -422,45 +421,45 @@ typedef struct galaxy_t
   double MetalsHotGas;
   double ColdGas;
   double MetalsColdGas;
-  //double H2Frac;
-  //double H2Mass;
-  //double HIMass;
-  //double Mcool;
+  // double H2Frac;
+  // double H2Mass;
+  // double HIMass;
+  // double Mcool;
   double StellarMass;
- // double GrossStellarMass;
+  // double GrossStellarMass;
   double Fesc;
   double FescWeightedGSM;
   double MetalsStellarMass;
-  //double DiskScaleLength;
+  // double DiskScaleLength;
   double Sfr;
   double EjectedGas;
   double MetalsEjectedGas;
   double BlackHoleMass;
-//  double FescBH;
- // double BHemissivity;
- // double EffectiveBHM;
+  //  double FescBH;
+  // double BHemissivity;
+  // double EffectiveBHM;
   double BlackHoleAccretedHotMass;
   double BlackHoleAccretedColdMass;
   double BlackHoleAccretingColdMass;
 
   // baryonic hostories
-//  double mwmsa_num;
-//  double mwmsa_denom;
+  //  double mwmsa_num;
+  //  double mwmsa_denom;
 
   // misc
-//  double Rcool;
-//  double Cos_Inc;
+  //  double Rcool;
+  //  double Cos_Inc;
   double MergTime;
-//  double MergerStartRadius;
+  //  double MergerStartRadius;
   double BaryonFracModifier;
-//  double FOFMvirModifier;
+  //  double FOFMvirModifier;
   double MvirCrit;
   double MergerBurstMass;
 
   int Type;
   int OldType;
   int Len;
-  //int MaxLen;
+  // int MaxLen;
   int SnapSkipCounter;
   int HaloDescIndex;
   int TreeFlags;
@@ -505,7 +504,7 @@ typedef struct fof_group_t
   double Mvir;
   double Rvir;
   double Vvir;
-//  double FOFMvirModifier;
+  //  double FOFMvirModifier;
   int TotalSubhaloLen;
 } fof_group_t;
 
@@ -619,30 +618,29 @@ extern run_globals_t run_globals;
  */
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-  // core/dracarys.c
-  void dracarys(void);
+// core/dracarys.c
+void dracarys(void);
 
-  // core/read_parameter_file.c
-  void read_parameter_file(char* fname, int mode);
+// core/read_parameter_file.c
+void read_parameter_file(char* fname, int mode);
 
-  // core/init.c
-  void init_storage(void);
-  void init_meraxes(void);
+// core/init.c
+void init_storage(void);
+void init_meraxes(void);
 
-  // core/cleanup.c
-  void cleanup(void);
+// core/cleanup.c
+void cleanup(void);
 
-  // core/magnitudes.c
-  void get_output_magnitudes(float* mags, float* dusty_mags, galaxy_t* gal, int snapshot);
+// core/magnitudes.c
+void get_output_magnitudes(float* mags, float* dusty_mags, galaxy_t* gal, int snapshot);
 
 // MCMC related
 // meraxes_mhysa_hook must be implemented by the calling code (Mhysa)!
 #ifdef _MAIN
-  int (*meraxes_mhysa_hook)(void* self, int snapshot, int ngals);
+int (*meraxes_mhysa_hook)(void* self, int snapshot, int ngals);
 #else
 extern int (*meraxes_mhysa_hook)(void* self, int snapshot, int ngals);
 #endif

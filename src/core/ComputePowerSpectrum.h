@@ -2,12 +2,11 @@
 #define COMPUTE_POWER_SPECTRUM_H
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-  void Initialise_PowerSpectrum();
-  void Compute_PS(int snapshot);
+void Initialise_PowerSpectrum();
+void Compute_PS(int snapshot);
 
 #ifdef __cplusplus
 }

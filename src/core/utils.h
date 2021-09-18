@@ -17,13 +17,12 @@ extern float timer_gpu;
 #endif
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-  void timer_start(timer_info* timer);
-  void timer_stop(timer_info* timer);
-  float timer_delta(timer_info timer);
+void timer_start(timer_info* timer);
+void timer_stop(timer_info* timer);
+float timer_delta(timer_info timer);
 
 #ifdef __cplusplus
 }

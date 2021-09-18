@@ -19,13 +19,12 @@ struct entry_t
 };
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-  int parse_slices(const char* string, const int arrmax, int** indices);
-  int parse_paramfile(char* fname, entry_t entry[PARAM_MAX_ENTRIES]);
-  void parse_output_snaps(const char* string);
+int parse_slices(const char* string, const int arrmax, int** indices);
+int parse_paramfile(char* fname, entry_t entry[PARAM_MAX_ENTRIES]);
+void parse_output_snaps(const char* string);
 
 #ifdef __cplusplus
 }

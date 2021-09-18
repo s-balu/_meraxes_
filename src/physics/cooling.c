@@ -55,7 +55,7 @@ double gas_cooling(galaxy_t* gal)
       assert(rho_r_cool > 0);
       isothermal_norm = gal->HotGas / (4. * M_PI * fof_group->Rvir);
       r_cool = sqrt(isothermal_norm / rho_r_cool);
-//      gal->Rcool = r_cool;
+      //      gal->Rcool = r_cool;
 
       // the maximum amount of gas we can possibly cool is limited by the amount
       // of mass within the free fall radius
@@ -98,7 +98,7 @@ void cool_gas_onto_galaxy(galaxy_t* gal, double cooling_mass)
   cooling_metals = cooling_mass * calc_metallicity(gal->HotGas, gal->MetalsHotGas);
 
   // save the cooling mass
-  //gal->Mcool = cooling_mass;
+  // gal->Mcool = cooling_mass;
 
   // update the galaxy reservoirs
   gal->HotGas -= cooling_mass;

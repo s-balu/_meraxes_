@@ -48,28 +48,27 @@ typedef struct gal_to_slab_t
 } gal_to_slab_t;
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-  void update_galaxy_fesc_vals(struct galaxy_t* gal, double new_stars, int snapshot);
-  void set_quasar_fobs(void);
-  void set_ReionEfficiency(void);
-  void assign_slabs(void);
-  void call_find_HII_bubbles(int snapshot, int nout_gals, timer_info* timer);
-  void call_ComputeTs(int snapshot, int nout_gals, timer_info* timer);
-  void init_reion_grids(void);
-  void malloc_reionization_grids(void);
-  void free_reionization_grids(void);
-  int map_galaxies_to_slabs(int ngals);
-  void assign_Mvir_crit_to_galaxies(int ngals_in_slabs);
-  void construct_baryon_grids(int snapshot, int ngals);
-  void gen_grids_fname(const int snapshot, char* name, const bool relative);
-  void save_reion_input_grids(int snapshot);
-  void save_reion_output_grids(int snapshot);
-  bool check_if_reionization_ongoing(int snapshot);
-  void filter(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim, float R, int filter_type);
-  void velocity_gradient(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim);
+void update_galaxy_fesc_vals(struct galaxy_t* gal, double new_stars, int snapshot);
+void set_quasar_fobs(void);
+void set_ReionEfficiency(void);
+void assign_slabs(void);
+void call_find_HII_bubbles(int snapshot, int nout_gals, timer_info* timer);
+void call_ComputeTs(int snapshot, int nout_gals, timer_info* timer);
+void init_reion_grids(void);
+void malloc_reionization_grids(void);
+void free_reionization_grids(void);
+int map_galaxies_to_slabs(int ngals);
+void assign_Mvir_crit_to_galaxies(int ngals_in_slabs);
+void construct_baryon_grids(int snapshot, int ngals);
+void gen_grids_fname(const int snapshot, char* name, const bool relative);
+void save_reion_input_grids(int snapshot);
+void save_reion_output_grids(int snapshot);
+bool check_if_reionization_ongoing(int snapshot);
+void filter(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim, float R, int filter_type);
+void velocity_gradient(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim);
 
 #ifdef __cplusplus
 }

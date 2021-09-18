@@ -164,7 +164,7 @@ void previous_merger_driven_BH_growth(galaxy_t* gal)
   // If there is any cold gas to feed the black hole...
   double m_reheat;
   double accreted_mass;
-//  double BHemissivity;
+  //  double BHemissivity;
   double Vvir;
   run_units_t* units = &(run_globals.units);
 
@@ -188,11 +188,11 @@ void previous_merger_driven_BH_growth(galaxy_t* gal)
   gal->BlackHoleAccretingColdMass -= accreted_mass;
 
   // N_gamma,q * N_bh; later 1e60*BHemissivity * PROTONMASS/1e10/SOLAR_MASS will be N_gamma,q * M_bh
-//  BHemissivity = calculate_BHemissivity(gal->BlackHoleMass, accreted_mass);
-//  gal->BHemissivity += BHemissivity;
+  //  BHemissivity = calculate_BHemissivity(gal->BlackHoleMass, accreted_mass);
+  //  gal->BHemissivity += BHemissivity;
   gal->BlackHoleMass += (1. - ETA) * accreted_mass;
-//  gal->EffectiveBHM +=
-//    BHemissivity * EMISSIVITY_CONVERTOR * gal->FescBH / run_globals.params.physics.ReionNionPhotPerBary;
+  //  gal->EffectiveBHM +=
+  //    BHemissivity * EMISSIVITY_CONVERTOR * gal->FescBH / run_globals.params.physics.ReionNionPhotPerBary;
 
   // quasar mode feedback
   m_reheat = run_globals.params.physics.QuasarModeEff * 2. * ETA * run_globals.Csquare * accreted_mass / Vvir / Vvir;
