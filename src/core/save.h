@@ -19,7 +19,7 @@ typedef struct galaxy_output_t
   int CentralGal;
   int GhostFlag;
   int Len;
-  int MaxLen;
+//  int MaxLen;
 
   float Pos[3];
   float Vel[3];
@@ -48,17 +48,17 @@ typedef struct galaxy_output_t
   float Sfr;
   float EjectedGas;
 //  float MetalsEjectedGas;
-  float BlackHoleMass;
+//  float BlackHoleMass;
   //float FescBH;
 //  float BHemissivity;
 //  float EffectiveBHM;
-  float BlackHoleAccretedHotMass;
-  float BlackHoleAccretedColdMass;
+//  float BlackHoleAccretedHotMass;
+//  float BlackHoleAccretedColdMass;
 
   // misc
 //  float Rcool;
 //  float Cos_Inc;
-  float MergTime;
+//  float MergTime;
  // float MergerStartRadius;
   float BaryonFracModifier;
 //  float FOFMvirModifier;
@@ -67,8 +67,8 @@ typedef struct galaxy_output_t
   float MergerBurstMass;
 
   // baryonic histories
-  float MWMSA; // Mass weighted mean stellar age
-  float NewStars[N_HISTORY_SNAPS];
+ // float MWMSA; // Mass weighted mean stellar age
+  //float NewStars[N_HISTORY_SNAPS];
 } galaxy_output_t;
 
 #ifdef __cplusplus
