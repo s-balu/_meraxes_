@@ -563,6 +563,7 @@ typedef struct run_globals_t
   reion_grids_t reion_grids;
   struct run_units_t units;
   hdf5_output_t hdf5props;
+  hdf5_output_t hdf5props_snip;
 
   MPI_Comm mpi_comm;
   int mpi_rank;

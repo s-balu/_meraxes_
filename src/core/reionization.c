@@ -165,6 +165,8 @@ void call_find_HII_bubbles(int snapshot, int nout_gals, timer_info* timer)
 {
   // Thin wrapper round find_HII_bubbles
 
+  int snapshots[12] = {48, 58, 75, 82, 86, 90, 94, 98, 103, 108, 113, 119};
+
   int total_n_out_gals = 0;
 
   reion_grids_t* grids = &(run_globals.reion_grids);
@@ -188,9 +190,14 @@ void call_find_HII_bubbles(int snapshot, int nout_gals, timer_info* timer)
     read_grid(DENSITY, snapshot, grids->deltax);
 
     // save the grids prior to doing FFTs to avoid precision loss and aliasing etc.
-    for (int i_out = 0; i_out < run_globals.NOutputSnaps; i_out++)
+    for (int i_out = 0; i_out < run_globals.NOutputSnaps; i_out++){
       if (snapshot == run_globals.ListOutputSnaps[i_out] && run_globals.params.Flag_OutputGrids)
-        save_reion_input_grids(snapshot);
+		for (int ii = 0; ii < 12; ii++){
+			if (i_out == snapshots[ii]){
+		        save_reion_input_grids(snapshot);
+			}
+		}
+	}
   }
 
   mlog("...done", MLOG_CLOSE);

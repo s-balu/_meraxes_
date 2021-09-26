@@ -26,7 +26,15 @@
 void prepare_galaxy_for_output(galaxy_t gal, galaxy_output_t* galout, int i_snap)
 {
   run_units_t* units = &(run_globals.units);
+  int snapshots[12] = {48, 58, 75, 82, 86, 90, 94, 98, 103, 108, 113, 119};
+  bool flag_snap = false;
+  for (int ii = 0; ii < 12; ii++){
+      if (i_snap == snapshots[ii]){
+          flag_snap = true;
+      }
+  }
 
+  if (flag_snap){
   galout->ID = gal.ID;
   galout->Type = gal.Type;
   if (!gal.ghost_flag) {
@@ -68,6 +76,11 @@ void prepare_galaxy_for_output(galaxy_t gal, galaxy_output_t* galout, int i_snap
 #ifdef CALC_MAGS
   get_output_magnitudes(galout->Mags, galout->DustyMags, &gal, run_globals.ListOutputSnaps[i_snap]);
 #endif
+  }
+else{
+  galout->ColdGas = (float)(gal.ColdGas);
+  galout->Sfr = (float)(gal.Sfr * units->UnitMass_in_g / units->UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS);
+}
 }
 
 void calc_hdf5_props()
@@ -79,10 +92,12 @@ void calc_hdf5_props()
 
   if (!run_globals.params.FlagMCMC) {
     hdf5_output_t* h5props = &(run_globals.hdf5props);
+    hdf5_output_t* h5props_snip = &(run_globals.hdf5props_snip);
     galaxy_output_t galout;
-    int i; // dummy
+    int i, i_snip; // dummy
 
     h5props->n_props = 25;
+    h5props_snip->n_props = 2;
 
 #ifdef CALC_MAGS
     h5props->n_props += 2;
@@ -91,28 +106,38 @@ void calc_hdf5_props()
 
     // Size of a single galaxy entry.
     h5props->dst_size = sizeof(galaxy_output_t);
+    h5props_snip->dst_size = sizeof(galaxy_output_t);
 
     // Create datatypes for different size arrays
     h5props->array3f_tid = H5Tarray_create(H5T_NATIVE_FLOAT, 1, (hsize_t[]){ 3 });
     h5props->array_nhist_f_tid = H5Tarray_create(H5T_NATIVE_FLOAT, 1, (hsize_t[]){ N_HISTORY_SNAPS });
+    h5props_snip->array3f_tid = H5Tarray_create(H5T_NATIVE_FLOAT, 1, (hsize_t[]){ 3 });
+    h5props_snip->array_nhist_f_tid = H5Tarray_create(H5T_NATIVE_FLOAT, 1, (hsize_t[]){ N_HISTORY_SNAPS });
 
     // Calculate the offsets of our struct members in memory
     h5props->dst_offsets = malloc(sizeof(size_t) * h5props->n_props);
+    h5props_snip->dst_offsets = malloc(sizeof(size_t) * h5props_snip->n_props);
     // Calculate the sizes of our struct members in memory.
     h5props->dst_field_sizes = malloc(sizeof(size_t) * h5props->n_props);
+    h5props_snip->dst_field_sizes = malloc(sizeof(size_t) * h5props_snip->n_props);
     // Give each galaxy property a field name in the table
     h5props->field_names = malloc(sizeof(const char*) * h5props->n_props);
+    h5props_snip->field_names = malloc(sizeof(const char*) * h5props_snip->n_props);
     // Assign a type to each galaxy property field in the table.
     h5props->field_types = malloc(sizeof(hid_t) * h5props->n_props);
+    h5props_snip->field_types = malloc(sizeof(hid_t) * h5props_snip->n_props);
     // Store the **output** units of each property for writing to the master file.
     // Units should be compatible with the python astropy.units module.
     h5props->field_units = malloc(sizeof(const char*) * h5props->n_props);
+    h5props_snip->field_units = malloc(sizeof(const char*) * h5props_snip->n_props);
     // Store the **output** h conversion for each property.  The string will be
     // parsed by python eval(), substituting h for the appropriate value at read
     // time and v for the property value.
     h5props->field_h_conv = malloc(sizeof(const char*) * h5props->n_props);
+    h5props_snip->field_h_conv = malloc(sizeof(const char*) * h5props_snip->n_props);
 
     i = 0;
+    i_snip = 0;
 
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, HaloID);
     h5props->dst_field_sizes[i] = sizeof(galout.HaloID);
@@ -226,6 +251,14 @@ void calc_hdf5_props()
     h5props->field_h_conv[i] = "v/h";
     h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
+    h5props_snip->dst_offsets[i_snip] = HOFFSET(galaxy_output_t, ColdGas);
+    h5props_snip->dst_field_sizes[i_snip] = sizeof(galout.ColdGas);
+    h5props_snip->field_names[i_snip] = "ColdGas";
+    h5props_snip->field_units[i_snip] = "1e10 solMass";
+    h5props_snip->field_h_conv[i_snip] = "v/h";
+    h5props_snip->field_types[i_snip++] = H5T_NATIVE_FLOAT;
+
+    /*    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Mcool);
     /*    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Mcool);
         h5props->dst_field_sizes[i] = sizeof(galout.Mcool);
         h5props->field_names[i] = "Mcool";
@@ -246,6 +279,13 @@ void calc_hdf5_props()
     h5props->field_units[i] = "solMass/yr";
     h5props->field_h_conv[i] = "None";
     h5props->field_types[i++] = H5T_NATIVE_FLOAT;
+
+    h5props_snip->dst_offsets[i_snip] = HOFFSET(galaxy_output_t, Sfr);
+    h5props_snip->dst_field_sizes[i_snip] = sizeof(galout.Sfr);
+    h5props_snip->field_names[i_snip] = "Sfr";
+    h5props_snip->field_units[i_snip] = "solMass/yr";
+    h5props_snip->field_h_conv[i_snip] = "None";
+    h5props_snip->field_types[i_snip++] = H5T_NATIVE_FLOAT;
 
 #ifdef CALC_MAGS
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Mags);
@@ -320,8 +360,8 @@ void calc_hdf5_props()
     h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
     // DEBUG
-    if (i != h5props->n_props) {
-      mlog_error("Incorrect number of galaxy properties in HDF5 file. Should be %d, but is %d", h5props->n_props, i);
+    if (i != h5props->n_props || i_snip != h5props_snip->n_props) {
+      mlog_error("Incorrect number of galaxy properties in HDF5 file. Should be %d(%d), but is %d(%d)", h5props->n_props, h5props_snip->n_props, i, i_snip);
       ABORT(EXIT_FAILURE);
     }
   }
@@ -695,7 +735,14 @@ void write_snapshot(int n_write, int i_out, int* last_n_write)
   int* fill_data = NULL;
   char target_group[20];
   galaxy_t* gal = NULL;
-  hdf5_output_t h5props = run_globals.hdf5props;
+  hdf5_output_t h5props = run_globals.hdf5props_snip;
+  int snapshots[12] = {48, 58, 75, 82, 86, 90, 94, 98, 103, 108, 113, 119};
+  for (int ii = 0; ii < 12; ii++){
+      if (i_out == snapshots[ii]){
+          h5props = run_globals.hdf5props;
+		  break;
+      }
+  }
   int gal_count = 0;
   int old_count = 0;
   int* first_progenitor_index = NULL;
@@ -817,7 +864,7 @@ void write_snapshot(int n_write, int i_out, int* last_n_write)
       gal = gal->Next;
     }
 
-    save_walk_indices(file_id,
+/*    save_walk_indices(file_id,
                       i_out,
                       calc_descendants_i_out,
                       descendant_index,
@@ -825,7 +872,7 @@ void write_snapshot(int n_write, int i_out, int* last_n_write)
                       next_progenitor_index,
                       *last_n_write,
                       n_write);
-
+*/
     // Free the allocated arrays
     free(first_progenitor_index);
     free(next_progenitor_index);
