@@ -47,7 +47,7 @@ void update_reservoirs_from_sf(galaxy_t* gal, double new_stars, int snapshot, SF
     gal->ColdGas -= new_stars;
     gal->MetalsColdGas -= new_stars * metallicity;
     gal->StellarMass += new_stars;
-    //    gal->GrossStellarMass += new_stars;
+    gal->GrossStellarMass += new_stars;
     gal->MetalsStellarMass += new_stars * metallicity;
 
     if ((type == INSITU) && !Flag_IRA && (gal->LastIdentSnap < (snapshot - 1))) {

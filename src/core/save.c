@@ -63,6 +63,7 @@ void prepare_galaxy_for_output(galaxy_t gal, galaxy_output_t* galout, int i_snap
   galout->ColdGas = (float)(gal.ColdGas);
   //  galout->Mcool = (float)(gal.Mcool);
   galout->StellarMass = (float)(gal.StellarMass);
+  galout->GrossStellarMass = (float)(gal.GrossStellarMass);
   galout->Fesc = (float)(gal.Fesc);
   galout->FescWeightedGSM = (float)(gal.FescWeightedGSM);
   galout->Sfr = (float)(gal.Sfr * units->UnitMass_in_g / units->UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS);
@@ -96,8 +97,8 @@ void calc_hdf5_props()
     galaxy_output_t galout;
     int i, i_snip; // dummy
 
-    h5props->n_props = 25;
-    h5props_snip->n_props = 2;
+    h5props->n_props = 26;
+    h5props_snip->n_props = 3;
 
 #ifdef CALC_MAGS
     h5props->n_props += 2;
@@ -266,6 +267,22 @@ void calc_hdf5_props()
         h5props->field_h_conv[i] = "v/h";
         h5props->field_types[i++] = H5T_NATIVE_FLOAT;*/
 
+    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, GrossStellarMass);
+    h5props->dst_field_sizes[i] = sizeof(galout.GrossStellarMass);
+    h5props->field_names[i] = "GrossStellarMass";
+    h5props->field_units[i] = "1e10 solMass";
+    h5props->field_h_conv[i] = "v/h";
+    h5props->field_types[i++] = H5T_NATIVE_FLOAT;
+
+    h5props_snip->dst_offsets[i] = HOFFSET(galaxy_output_t, GrossStellarMass);
+    h5props_snip->dst_field_sizes[i] = sizeof(galout.GrossStellarMass);
+    h5props_snip->field_names[i] = "GrossStellarMass";
+    h5props_snip->field_units[i] = "1e10 solMass";
+    h5props_snip->field_h_conv[i] = "v/h";
+    h5props_snip->field_types[i++] = H5T_NATIVE_FLOAT;
+
+    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Sfr);
+    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Sfr);
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, StellarMass);
     h5props->dst_field_sizes[i] = sizeof(galout.StellarMass);
     h5props->field_names[i] = "StellarMass";

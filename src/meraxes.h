@@ -426,7 +426,7 @@ typedef struct galaxy_t
   // double HIMass;
   // double Mcool;
   double StellarMass;
-  // double GrossStellarMass;
+  double GrossStellarMass;
   double Fesc;
   double FescWeightedGSM;
   double MetalsStellarMass;
