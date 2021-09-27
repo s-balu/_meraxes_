@@ -274,12 +274,12 @@ void calc_hdf5_props()
     h5props->field_h_conv[i] = "v/h";
     h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
-    h5props_snip->dst_offsets[i] = HOFFSET(galaxy_output_t, GrossStellarMass);
-    h5props_snip->dst_field_sizes[i] = sizeof(galout.GrossStellarMass);
-    h5props_snip->field_names[i] = "GrossStellarMass";
-    h5props_snip->field_units[i] = "1e10 solMass";
-    h5props_snip->field_h_conv[i] = "v/h";
-    h5props_snip->field_types[i++] = H5T_NATIVE_FLOAT;
+    h5props_snip->dst_offsets[i_snip] = HOFFSET(galaxy_output_t, GrossStellarMass);
+    h5props_snip->dst_field_sizes[i_snip] = sizeof(galout.GrossStellarMass);
+    h5props_snip->field_names[i_snip] = "GrossStellarMass";
+    h5props_snip->field_units[i_snip] = "1e10 solMass";
+    h5props_snip->field_h_conv[i_snip] = "v/h";
+    h5props_snip->field_types[i_snip++] = H5T_NATIVE_FLOAT;
 
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Sfr);
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Sfr);
@@ -962,8 +962,13 @@ void write_snapshot(int n_write, int i_out, int* last_n_write)
   free(output_buffer);
 
   if (run_globals.params.Flag_PatchyReion && check_if_reionization_ongoing(run_globals.ListOutputSnaps[i_out]) &&
-      (run_globals.params.Flag_OutputGrids))
-    save_reion_output_grids(run_globals.ListOutputSnaps[i_out]);
+      (run_globals.params.Flag_OutputGrids)){
+	  for (int ii = 0; ii < 12; ii++){
+		  if (i_out == snapshots[ii]){
+		    save_reion_output_grids(run_globals.ListOutputSnaps[i_out]);
+		  }
+	  }
+  }
 
   // Close the group.
   H5Gclose(group_id);
