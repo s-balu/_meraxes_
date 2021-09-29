@@ -109,13 +109,29 @@ void init_templates_mini(mag_params_t* miniSpectra,
   struct sed_params_t spectra[MAGS_N_SNAPS];
   int nAgeStep;
   double* ageStep;
+  FILE *ptr;
+  int hst_number[2] = {9001, 9001};
+  double hst_lambda[2][9001];
+  double hst_transmission[2][9001];
+  ptr = fopen("/home/yqin/bitbucket/meraxes/src/core/HST_IR_wavelength.bin", "rb");
+  fread(hst_lambda[0], sizeof(hst_lambda[0]), 1, ptr);
+  fclose(ptr);
+  ptr = fopen("/home/yqin/bitbucket/meraxes/src/core/HST_IR_wavelength.bin", "rb");
+  fread(hst_lambda[1], sizeof(hst_lambda[1]), 1, ptr);
+  fclose(ptr);
+  ptr = fopen("/home/yqin/bitbucket/meraxes/src/core/HST_IR_F160W_transmission.bin", "rb");
+  fread(hst_transmission[0], sizeof(hst_transmission[0]), 1, ptr);
+  fclose(ptr);
+  ptr = fopen("/home/yqin/bitbucket/meraxes/src/core/HST_IR_F125W_transmission.bin", "rb");
+  fread(hst_transmission[1], sizeof(hst_transmission[1]), 1, ptr);
+  fclose(ptr);
 
   for (iS = 0; iS < MAGS_N_SNAPS; ++iS) {
     nAgeStep = targetSnap[iS];
     // Initialise raw templates
     init_templates_raw(spectra + iS, fName);
     // Initialise filters
-    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, NULL, NULL, NULL, 0, 1. + redshifts[iS]);
+    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, hst_transmission, hst_lambda, hst_number, 2, 1. + redshifts[iS]);
     if (spectra[iS].nFlux != MAGS_N_BANDS) {
       mlog_error("MAGS_N_BANDS does not match!\n");
       exit(EXIT_FAILURE);
@@ -314,7 +330,7 @@ void init_magnitudes(void)
     for (int i_band = 0; i_band < n_rest; ++i_band)
       mlog("#\t%.1f AA to %.1f", MLOG_MESG, rest_bands[2 * i_band], rest_bands[2 * i_band + 1]);
     //
-    if (n_beta + n_rest != MAGS_N_BANDS) {
+    if (n_beta + n_rest + 2!= MAGS_N_BANDS) {
       mlog_error("Number of beta and rest-frame filters do not match MAGS_N_BANDS!", MLOG_MESG);
       ABORT(EXIT_FAILURE);
     }
