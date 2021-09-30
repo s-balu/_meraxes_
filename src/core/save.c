@@ -897,7 +897,7 @@ void write_snapshot(int n_write, int i_out, int* last_n_write)
       gal = gal->Next;
     }
 
-/*    save_walk_indices(file_id,
+    save_walk_indices(file_id,
                       i_out,
                       calc_descendants_i_out,
                       descendant_index,
@@ -905,7 +905,7 @@ void write_snapshot(int n_write, int i_out, int* last_n_write)
                       next_progenitor_index,
                       *last_n_write,
                       n_write);
-*/
+
     // Free the allocated arrays
     free(first_progenitor_index);
     free(next_progenitor_index);

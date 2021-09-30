@@ -34,7 +34,7 @@ typedef struct galaxy_output_t
   float HotGas;
   //  float MetalsHotGas;
   float ColdGas;
-  //  float MetalsColdGas;
+  float MetalsColdGas;
   // float H2Frac;
   // float H2Mass;
   // float HIMass;
