@@ -303,8 +303,25 @@ void read_trees__velociraptor(int snapshot,
         if (halo->Type == 0) {
           fof_group_t* fof_group = &fof_groups[*n_fof_groups];
 
-          fof_group->Mvir = tree_entry.Mass_tot;
-          fof_group->Rvir = -1;
+          if (tree_entry.Mass_200crit <= 0) {
+            // This "halo" is not above the virial threshold!  Use
+            // proxy masses, but flag this fact so we know not to do
+            // any or allow any hot halo to exist.
+            halo->TreeFlags |= TREE_CASE_BELOW_VIRIAL_THRESHOLD;
+            fof_group->Mvir = tree_entry.Mass_tot;
+            fof_group->Rvir = -1;
+            // } else if (tree_entry.Mass_200crit < tree_entry.Mass_tot){
+            // // The central subhalo has a proxy mass larger than the FOF
+            // // group. Entirely possible for non-virialised and relaxed
+            // // halos but doesn't really lead to internal consistency.
+            // // Let's therefore just set the FOF virial mass to be that
+            // // central subhalo proxy mass.
+            // fof_group->Mvir = tree_entry.Mass_FOF;
+            // fof_group->Rvir = -1;
+          } else {
+            fof_group->Mvir = tree_entry.Mass_200crit;
+            fof_group->Rvir = tree_entry.R_200crit;
+          }
           fof_group->Vvir = -1;
           fof_group->FOFMvirModifier = 1.0;
 
