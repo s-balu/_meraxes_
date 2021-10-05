@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 void Initialise_PowerSpectrum();
-void Compute_PS(int snapshot);
+void Compute_PS();//int snapshot);
 
 #ifdef __cplusplus
 }

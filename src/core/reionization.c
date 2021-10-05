@@ -1528,7 +1528,8 @@ void filter(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim, f
   } // End looping through k box
 }
 
-void velocity_gradient(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim)
+//void velocity_gradient(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim)
+void velocity_gradient(fftwf_complex* box, int slab_nx, int grid_dim)
 {
   int middle = grid_dim / 2;
   float box_size = (float)run_globals.params.BoxSize;

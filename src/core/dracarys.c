@@ -320,7 +320,7 @@ void dracarys()
               }
 
               if (run_globals.params.Flag_ComputePS) {
-                Compute_PS(snapshot);
+                Compute_PS();//snapshot);
               }
             }
           }
@@ -337,7 +337,7 @@ void dracarys()
           }
 
           if (run_globals.params.Flag_ComputePS) {
-            Compute_PS(snapshot);
+            Compute_PS();//snapshot);
           }
 
           if (run_globals.params.Flag_ConstructLightcone) {

@@ -114,7 +114,8 @@ double HeII_ion_crosssec(double nu);
 double HeI_ion_crosssec(double nu);
 
 /* Calculates the optical depth for a photon arriving at z = zp with frequency nu, emitted at z = zpp */
-double tauX(double nu, double x_e, double zp, double zpp, double fcoll, double HI_filling_factor_zp, int snap_i);
+//double tauX(double nu, double x_e, double zp, double zpp, double fcoll, double HI_filling_factor_zp, int snap_i);
+double tauX(double nu, double x_e, double zp, double zpp,double HI_filling_factor_zp, int snap_i);
 
 /* The total weighted HI + HeI + HeII  cross-section in pcm^-2 */
 double species_weighted_x_ray_cross_section(double nu, double x_e);
@@ -177,7 +178,7 @@ void evolveInt(float zp,
                const double freq_int_heat_QSO[],
                const double freq_int_ion_QSO[],
                const double freq_int_lya_QSO[],
-               int COMPUTE_Ts,
+     //          int COMPUTE_Ts,
                const double y[],
                double deriv[]);
 

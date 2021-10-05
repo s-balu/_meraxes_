@@ -218,7 +218,8 @@ typedef struct
 double nu_tau_one_helper(double nu, void* params)
 {
   nu_tau_one_params* p = (nu_tau_one_params*)params;
-  return tauX(nu, p->x_e, p->zp, p->zpp, p->fcoll, p->HI_filling_factor_zp, p->snap_i) - 1;
+  //return tauX(nu, p->x_e, p->zp, p->zpp, p->fcoll, p->HI_filling_factor_zp, p->snap_i) - 1;
+  return tauX(nu, p->x_e, p->zp, p->zpp, p->HI_filling_factor_zp, p->snap_i) - 1;
 }
 double nu_tau_one(double zp, double zpp, double x_e, double fcoll, double HI_filling_factor_zp, int snap_i)
 {
@@ -245,7 +246,8 @@ double nu_tau_one(double zp, double zpp, double x_e, double fcoll, double HI_fil
   }
 
   // check if lower bound has null
-  if (tauX(HeI_NUIONIZATION, x_e, zp, zpp, fcoll, HI_filling_factor_zp, snap_i) < 1)
+  //if (tauX(HeI_NUIONIZATION, x_e, zp, zpp, fcoll, HI_filling_factor_zp, snap_i) < 1)
+  if (tauX(HeI_NUIONIZATION, x_e, zp, zpp, HI_filling_factor_zp, snap_i) < 1)
     return HeI_NUIONIZATION;
 
   // set frequency boundary values
@@ -312,7 +314,8 @@ double tauX_integrand(double zhat, void* params)
   sigma_tilde = species_weighted_x_ray_cross_section(nuhat, p->x_e);
   return drpropdz * n * HI_filling_factor_zhat * sigma_tilde;
 }
-double tauX(double nu, double x_e, double zp, double zpp, double fcoll, double HI_filling_factor_zp, int snap_i)
+//double tauX(double nu, double x_e, double zp, double zpp, double fcoll, double HI_filling_factor_zp, int snap_i)
+double tauX(double nu, double x_e, double zp, double zpp, double HI_filling_factor_zp, int snap_i)
 {
   double result, error;
   gsl_function F;
@@ -1188,7 +1191,7 @@ void evolveInt(float zp,
                const double freq_int_heat_QSO[],
                const double freq_int_ion_QSO[],
                const double freq_int_lya_QSO[],
-               int COMPUTE_Ts,
+               //int COMPUTE_Ts,
                const double y[],
                double deriv[])
 {

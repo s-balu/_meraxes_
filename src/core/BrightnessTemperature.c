@@ -179,8 +179,9 @@ void ComputeBrightnessTemperatureBox(int snapshot)
       vel_gradient[ii] *= run_globals.params.Hubble_h;
     }
 
-    int local_ix_start = (int)(run_globals.reion_grids.slab_ix_start[run_globals.mpi_rank]);
-    velocity_gradient(vel_gradient, local_ix_start, local_nix, ReionGridDim);
+//    int local_ix_start = (int)(run_globals.reion_grids.slab_ix_start[run_globals.mpi_rank]);
+    velocity_gradient(vel_gradient, local_nix, ReionGridDim);
+    //velocity_gradient(vel_gradient, local_ix_start, local_nix, ReionGridDim);
 
     fftwf_execute(run_globals.reion_grids.vel_gradient_reverse_plan);
 

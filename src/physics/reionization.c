@@ -62,12 +62,12 @@ double tocf_modifier(galaxy_t* gal, double Mvir)
   return pow(2.0, -1.0 * gal->MvirCrit / Mvir);
 }
 
-static double inline M0(double z)
+inline static double M0(double z)
 {
   return Tvir_to_Mvir(run_globals.params.physics.ReionSobacchi_T0, z);
 }
 
-static double inline Mcool(double z)
+inline static double Mcool(double z)
 {
   return Tvir_to_Mvir(run_globals.params.physics.ReionTcool, z);
 }

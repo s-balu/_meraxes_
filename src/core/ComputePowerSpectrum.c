@@ -30,10 +30,10 @@ void Initialise_PowerSpectrum()
   // ghetto counting (lookup how to do logs of arbitrary bases in c...)
   int num_bins = 0;
   float k_ceil = k_first_bin_ceil;
-  float k_floor = k_ceil;
+//  float k_floor = k_ceil;
   while (k_ceil < k_max) {
     num_bins++;
-    k_floor = k_ceil;
+//    k_floor = k_ceil;
     k_ceil *= k_factor;
   }
 
@@ -41,7 +41,8 @@ void Initialise_PowerSpectrum()
   mlog("Initialise_PowerSpectrum set PS_Length to %d.", MLOG_MESG, run_globals.params.PS_Length);
 }
 
-void Compute_PS(int snapshot)
+//void Compute_PS(int snapshot)
+void Compute_PS()
 {
 
   float* delta_T = run_globals.reion_grids.delta_T;

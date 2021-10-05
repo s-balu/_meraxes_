@@ -7,7 +7,7 @@
 #include "modifiers.h"
 #include "read_halos.h"
 
-static void inline update_pointers_from_offsets(int n_fof_groups_kept,
+inline static void update_pointers_from_offsets(int n_fof_groups_kept,
                                                 fof_group_t* fof_group,
                                                 const size_t* fof_FirstHalo_os,
                                                 int n_halos_kept,

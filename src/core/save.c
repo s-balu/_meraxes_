@@ -276,7 +276,6 @@ void calc_hdf5_props()
     h5props_snip->field_h_conv[i_snip] = "v/h";
     h5props_snip->field_types[i_snip++] = H5T_NATIVE_FLOAT;
     /*    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Mcool);
-    /*    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Mcool);
         h5props->dst_field_sizes[i] = sizeof(galout.Mcool);
         h5props->field_names[i] = "Mcool";
         h5props->field_units[i] = "1e10 solMass";
@@ -666,7 +665,7 @@ void create_master_file()
   mlog(" ...done", MLOG_CLOSE | MLOG_TIMERSTOP);
 }
 
-static void inline save_walk_indices(hid_t file_id,
+inline static void save_walk_indices(hid_t file_id,
                                      int i_out,
                                      int prev_i_out,
                                      int* descendant_index,
@@ -743,7 +742,7 @@ static void inline save_walk_indices(hid_t file_id,
   }
 }
 
-static inline bool pass_write_check(galaxy_t* gal, bool flag_merger)
+inline static bool pass_write_check(galaxy_t* gal, bool flag_merger)
 {
   if (
     // Test for non-merger galaxy to be written in the current snap

@@ -166,7 +166,7 @@ void insitu_star_formation(galaxy_t* gal, int snapshot)
   }
 }
 
-static double integrand_p_dependent_SFR(double q, void* gal)
+/*static double integrand_p_dependent_SFR(double q, void* gal)
 {
   struct FR_parameters* params = (struct FR_parameters*)gal;
 
@@ -215,7 +215,7 @@ static double p_dependent_SFR(double lower_limit,
 
   return result;
 }
-
+*/
 // double pressure_dependent_star_formation(galaxy_t* gal, int snapshot)
 //{
 //  /*

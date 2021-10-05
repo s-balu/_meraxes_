@@ -39,7 +39,7 @@ void _ComputeTs(int snapshot)
     prev_redshift = run_globals.ZZ[snapshot - 1];
   }
 
-  int i_real, i_padded, i_smoothedSFR, R_ct, x_e_ct, n_ct, m_xHII_low, m_xHII_high, NO_LIGHT;
+  int i_real, i_padded, i_smoothedSFR, R_ct, x_e_ct, n_ct, m_xHII_low, m_xHII_high;//, NO_LIGHT;
 
   double prev_zpp, prev_R, zpp, zp, lower_int_limit_GAL, lower_int_limit_QSO, filling_factor_of_HI_zp, R_factor, R,
     nuprime, dzp, Luminosity_converstion_factor_GAL, Luminosity_converstion_factor_QSO;
@@ -74,7 +74,7 @@ void _ComputeTs(int snapshot)
   float* Tk_box = run_globals.reion_grids.Tk_box;
   float* TS_box = run_globals.reion_grids.TS_box;
 
-  float* sfr = run_globals.reion_grids.sfr;
+//  float* sfr = run_globals.reion_grids.sfr;
 
   fftwf_complex* sfr_unfiltered = run_globals.reion_grids.sfr_unfiltered;
   fftwf_complex* sfr_filtered = run_globals.reion_grids.sfr_filtered;
@@ -248,12 +248,12 @@ void _ComputeTs(int snapshot)
     }
 
     // A condition (defined by whether or not there are stars) for evaluating the heating/ionisation integrals
-    if (collapse_fraction > 0.0) {
+/*    if (collapse_fraction > 0.0) {
       NO_LIGHT = 0;
     } else {
       NO_LIGHT = 1;
     }
-
+*/
     // Populate the initial ionisation/heating tables
     for (R_ct = 0; R_ct < TsNumFilterSteps; R_ct++) {
 
@@ -548,7 +548,7 @@ void _ComputeTs(int snapshot)
                     freq_int_heat_QSO,
                     freq_int_ion_QSO,
                     freq_int_lya_QSO,
-                    NO_LIGHT,
+                   // NO_LIGHT,
                     ans,
                     dansdz);
 
