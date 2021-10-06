@@ -61,7 +61,7 @@ inline static void convert_input_virial_props(double* Mvir,
                                               double* Vvir,
                                               //                                              double* FOFMvirModifier,
                                               const int len,
-                                              const int snapshot,)
+                                              const int snapshot)
 //                                              const bool fof_flag)
 {
   // Update the virial properties for subhalos
