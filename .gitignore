@@ -47,3 +47,4 @@ src/.vscode
 .vscode
 Doxy*
 ./input/photometric_tables/sed_library.hdf5
+src/core/magnitudes.c
