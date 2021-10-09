@@ -150,42 +150,41 @@ void init_templates_mini(mag_params_t* miniSpectra,
     hst_number[1] = spectra[iS].nWaves;
     hst_transmission_splined = (double*)malloc((hst_number[0]+hst_number[1])*sizeof(double));
     hst_lambda_splined = (double*)malloc((hst_number[0]+hst_number[1])*sizeof(double));
-    mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[iS]);
+    mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[nAgeStep]);
     
     for (iwave=0; iwave<hst_number[0]; iwave++){
         if (iwave==0)
-            hst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[iS] +1e-4);
+            hst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] +1e-4);
         else if (iwave==hst_number[0]-1)
-            hst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[iS] -1e-4);
+            hst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] -1e-4);
         else
-            hst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[iS]);
-        if (hst_lambda_splined[iwave] < hst_lambda[0] || hst_lambda_splined[iwave]>hst_lambda[9000]){
+            hst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]);
+        if (hst_lambda_splined[iwave] < hst_lambda[0] || hst_lambda_splined[iwave]>hst_lambda[9000])
             hst_transmission_splined[iwave] = 0;
-        }
         else{
             hst_transmission_splined[iwave] = gsl_spline_eval(spline[0], hst_lambda_splined[iwave], acc[0]);
-        }
-        mlog("iwave = %d: spectra.waves=%.1f, hst_lambda_splined=%.1f, hst_transmission_splined=%.6f",MLOG_MESG, iwave, spectra[iS].waves[iwave], hst_lambda_splined[iwave], hst_transmission_splined[iwave]);
+	        mlog("iwave = %d: spectra.waves=%.1f, hst_lambda_splined=%.1f, hst_transmission_splined=%.6f",MLOG_MESG, iwave, spectra[iS].waves[iwave], hst_lambda_splined[iwave], hst_transmission_splined[iwave]);
+		}
     }
     for (iwave=0; iwave<hst_number[1]; iwave++){
         if (iwave==0)
-            hst_lambda_splined[iwave+hst_number[0]] = spectra[iS].waves[iwave] * (1.+ redshifts[iS]+1e-4);
+            hst_lambda_splined[iwave+hst_number[0]] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]+1e-4);
         else if (iwave==hst_number[1]-1)
-            hst_lambda_splined[iwave+hst_number[0]] = spectra[iS].waves[iwave] * (1.+ redshifts[iS]-1e-4);
+            hst_lambda_splined[iwave+hst_number[0]] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]-1e-4);
         else
-            hst_lambda_splined[iwave+hst_number[0]] = spectra[iS].waves[iwave] * (1.+ redshifts[iS]);
+            hst_lambda_splined[iwave+hst_number[0]] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]);
         if (hst_lambda_splined[iwave+hst_number[0]] < hst_lambda[0] || hst_lambda_splined[iwave+hst_number[0]]>hst_lambda[9000])
             hst_transmission_splined[iwave+hst_number[0]] = 0;
         else{
             hst_transmission_splined[iwave+hst_number[0]] = gsl_spline_eval(spline[1], hst_lambda_splined[iwave+hst_number[0]], acc[1]);
-    //        mlog("iwave = %d: spectra.waves=%.1f, hst_lambda_splined=%.1f, hst_transmission_splined=%.6f",MLOG_MESG, iwave, spectra[iS].waves[iwave], hst_lambda_splined[iwave+hst_number[0]], hst_transmission_splined[iwave+hst_number[0]]);
-        }
+        	mlog("iwave = %d: spectra.waves=%.1f, hst_lambda_splined=%.1f, hst_transmission_splined=%.6f",MLOG_MESG, iwave, spectra[iS].waves[iwave], hst_lambda_splined[iwave+hst_number[0]], hst_transmission_splined[iwave+hst_number[0]]);
+		}
     }
 
     // Initialise filters
-    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, hst_transmission_splined, hst_lambda_splined, hst_number, 2, redshifts[iS]);
-    for (iwave=0; iwave<spectra[iS].nWaves; iwave++)
-        mlog("iwave = %d: spectra.waves=%e,spectra.filterWaves=%e",MLOG_MESG, iwave,spectra[iS].waves[iwave],spectra[iS].filterWaves[iwave]);
+    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, hst_transmission_splined, hst_lambda_splined, hst_number, 2, redshifts[nAgeStep]);
+	for (iwave=0; iwave<3; iwave++)
+        mlog("iwave = %d: spectra.centreWave=%.1f",MLOG_MESG, iwave, spectra[iS].centreWaves[iwave]);
 
     if (spectra[iS].nFlux != MAGS_N_BANDS) {
       mlog_error("MAGS_N_BANDS does not match!\n");
