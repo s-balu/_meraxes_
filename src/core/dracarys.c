@@ -371,7 +371,7 @@ void dracarys()
         if (snapshot == run_globals.ListOutputSnaps[i_out])
           write_snapshot(nout_gals, i_out, &last_nout_gals);
     
-    if check_if_reionization_ongoing(snapshot)
+    if (check_if_reionization_ongoing(snapshot))
       save_reion_output_grids(snapshot);
     
     // Update the LastIdentSnap values for non-ghosts
