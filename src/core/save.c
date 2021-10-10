@@ -898,16 +898,9 @@ void write_snapshot(int n_write, int i_out, int* last_n_write)
   // Free the output buffer
   free(output_buffer);
 
-  int snapshots[60] = {60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,
-  90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119};
-
-  if (run_globals.params.Flag_PatchyReion && run_globals.params.Flag_OutputGrids)
-  {
-  	for (int ii = 0; ii < 60; ii++)
-    {
-      save_reion_output_grids(snapshots[ii]]);
-		}
-	}
+  // if (run_globals.params.Flag_PatchyReion && check_if_reionization_ongoing(run_globals.ListOutputSnaps[i_out]) &&
+  //     (run_globals.params.Flag_OutputGrids))
+  //   save_reion_output_grids(run_globals.ListOutputSnaps[i_out]);
 
   // Close the group.
   H5Gclose(group_id);

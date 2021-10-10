@@ -371,6 +371,8 @@ void dracarys()
         if (snapshot == run_globals.ListOutputSnaps[i_out])
           write_snapshot(nout_gals, i_out, &last_nout_gals);
 
+    save_reion_output_grids(snapshot);
+    
     // Update the LastIdentSnap values for non-ghosts
     gal = run_globals.FirstGal;
     while (gal != NULL) {
