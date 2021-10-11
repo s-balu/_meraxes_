@@ -5,6 +5,7 @@
 #include <hdf5_hl.h>
 #include <math.h>
 #include <sys/stat.h>
+
 #include "ComputeTs.h"
 #include "find_HII_bubbles.h"
 #include "meraxes.h"
@@ -12,6 +13,7 @@
 #include "read_grids.h"
 #include "reionization.h"
 #include "virial_properties.h"
+
 void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
 {
   physics_params_t* params = &(run_globals.params.physics);
@@ -72,6 +74,7 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
     default:
       mlog_error("Unrecognised EscapeFracDependency parameter value.");
   }
+
   if (fesc > 1.0)
     fesc = 1.0;
   else if (fesc < 0.0)
@@ -100,55 +103,69 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
 void set_quasar_fobs()
 {
   physics_params_t* params = &(run_globals.params.physics);
+
   params->quasar_fobs = 1. - cos(params->quasar_open_angle / 180. * M_PI / 2.);
   mlog("Quasar radiation open angle is set to be %g, corresponding to an obscure fraction of %g",
        MLOG_MESG | MLOG_FLUSH,
        params->quasar_open_angle,
        params->quasar_fobs);
 }
+
 void set_ReionEfficiency()
 {
   // Use the params passed to Meraxes via the input file to set the HII ionising efficiency factor
   physics_params_t* params = &(run_globals.params.physics);
+
   // The following is based on Sobacchi & Messinger (2013) eqn 7
   // with f_* removed and f_b added since we define f_coll as M_*/M_tot rather than M_vir/M_tot,
   // and also with the inclusion of the effects of the Helium fraction.
   params->ReionEfficiency =
     1.0 / run_globals.params.BaryonFrac * params->ReionNionPhotPerBary / (1.0 - 0.75 * params->Y_He);
+
   // Account for instantaneous recycling factor so that stellar mass is cumulative
   if (params->Flag_IRA)
     params->ReionEfficiency /= params->SfRecycleFraction;
+
   mlog("Set value of run_globals.params.ReionEfficiency = %g", MLOG_MESG, params->ReionEfficiency);
 }
+
 void assign_slabs()
 {
   mlog("Assigning slabs to MPI cores...", MLOG_OPEN);
+
   // Assign the slab size
   int n_rank = run_globals.mpi_size;
   int dim = run_globals.params.ReionGridDim;
+
   // Use fftw to find out what slab each rank should get
   ptrdiff_t local_nix, local_ix_start;
   ptrdiff_t local_n_complex =
     fftwf_mpi_local_size_3d(dim, dim, dim / 2 + 1, run_globals.mpi_comm, &local_nix, &local_ix_start);
+
   // let every core know...
   ptrdiff_t** slab_nix = &run_globals.reion_grids.slab_nix;
   *slab_nix = malloc(sizeof(ptrdiff_t) * n_rank); ///< array of number of x cells of every rank
   MPI_Allgather(&local_nix, sizeof(ptrdiff_t), MPI_BYTE, *slab_nix, sizeof(ptrdiff_t), MPI_BYTE, run_globals.mpi_comm);
+
   ptrdiff_t** slab_ix_start = &run_globals.reion_grids.slab_ix_start;
   *slab_ix_start = malloc(sizeof(ptrdiff_t) * n_rank); ///< array first x cell of every rank
   (*slab_ix_start)[0] = 0;
   for (int ii = 1; ii < n_rank; ii++)
     (*slab_ix_start)[ii] = (*slab_ix_start)[ii - 1] + (*slab_nix)[ii - 1];
+
   ptrdiff_t** slab_n_complex = &run_globals.reion_grids.slab_n_complex; ///< array of allocation counts for every rank
   *slab_n_complex = malloc(sizeof(ptrdiff_t) * n_rank);                 ///< array of allocation counts for every rank
   MPI_Allgather(
     &local_n_complex, sizeof(ptrdiff_t), MPI_BYTE, *slab_n_complex, sizeof(ptrdiff_t), MPI_BYTE, run_globals.mpi_comm);
+
   mlog("...done", MLOG_CLOSE);
 }
 
 void call_find_HII_bubbles(int snapshot, int nout_gals, timer_info* timer)
 {
   // Thin wrapper round find_HII_bubbles
+
+//  int snapshots[12] = {48, 58, 75, 82, 86, 90, 94, 98, 103, 108, 113, 119};
 
   int total_n_out_gals = 0;
 
@@ -172,10 +189,15 @@ void call_find_HII_bubbles(int snapshot, int nout_gals, timer_info* timer)
     // Read in the dark matter density grid
     read_grid(DENSITY, snapshot, grids->deltax);
 
-    // // save the grids prior to doing FFTs to avoid precision loss and aliasing etc.
-    // for (int i_out = 0; i_out < run_globals.NOutputSnaps; i_out++)
-    //   if (snapshot == run_globals.ListOutputSnaps[i_out] && run_globals.params.Flag_OutputGrids)
-    //     save_reion_input_grids(snapshot);
+    // save the grids prior to doing FFTs to avoid precision loss and aliasing etc.
+ //   for (int i_out = 0; i_out < run_globals.NOutputSnaps; i_out++){
+   //   if (snapshot == run_globals.ListOutputSnaps[i_out] && run_globals.params.Flag_OutputGrids)
+//		for (int ii = 0; ii < 12; ii++){
+//			if (i_out == snapshots[ii]){
+//		        save_reion_input_grids(snapshot);
+//			}
+//		}
+	}
   }
 
   mlog("...done", MLOG_CLOSE);
@@ -219,11 +241,11 @@ void call_ComputeTs(int snapshot, int nout_gals, timer_info* timer)
     read_grid(run_globals.params.TsVelocityComponent, snapshot, grids->vel);
   }
 
-  // // save the grids prior to doing FFTs to avoid precision loss and aliasing etc.
-  // for (int i_out = 0; i_out < run_globals.NOutputSnaps; i_out++)
-  //   if (snapshot == run_globals.ListOutputSnaps[i_out] && run_globals.params.Flag_OutputGrids &&
-  //       !run_globals.params.FlagMCMC)
-  //     save_reion_input_grids(snapshot);
+  // save the grids prior to doing FFTs to avoid precision loss and aliasing etc.
+ // for (int i_out = 0; i_out < run_globals.NOutputSnaps; i_out++)
+   // if (snapshot == run_globals.ListOutputSnaps[i_out] && run_globals.params.Flag_OutputGrids &&
+     //   !run_globals.params.FlagMCMC)
+      //save_reion_input_grids(snapshot);
 
   mlog("...done", MLOG_CLOSE);
 
@@ -367,8 +389,6 @@ void init_reion_grids()
 
 void malloc_reionization_grids()
 {
-  mlog("Allocating reionization grids...", MLOG_OPEN);
-
   reion_grids_t* grids = &(run_globals.reion_grids);
 
   fftwf_mpi_init();
@@ -393,7 +413,7 @@ void malloc_reionization_grids()
       } else {
         mlog("FFTW3 wisdom directory provided, but no suitable wisdom exists. New wisdom will be created (this make "
              "take a while).",
-             MLOG_MESG | MLOG_FLUSH);
+             MLOG_MESG);
         save_wisdom = true;
         // Check to see if the wisdom directory exists and if not, create it
         struct stat filestatus;
@@ -657,8 +677,6 @@ void malloc_reionization_grids()
     }
 
   } // if (run_globals.params.Flag_PatchyReion)
-
-  mlog("...done", MLOG_CLOSE);
 }
 
 void free_reionization_grids()
@@ -970,7 +988,7 @@ void construct_baryon_grids(int snapshot, int local_ngals)
   for (int prop = prop_stellar; prop <= prop_sfr; prop++) {
     int i_gal = 0;
     int skipped_gals = 0;
-    long N_BlackHoleMassLimitReion = 0;
+    //    long N_BlackHoleMassLimitReion = 0;
 
     for (int i_r = 0; i_r < run_globals.mpi_size; i_r++) {
       // init the buffer
@@ -1014,22 +1032,22 @@ void construct_baryon_grids(int snapshot, int local_ngals)
 
               buffer[ind] += gal->FescWeightedGSM;
               // a trick to include quasar radiation using current 21cmFAST code
-              if (run_globals.params.physics.Flag_BHFeedback) {
-                if (gal->BlackHoleMass >= run_globals.params.physics.BlackHoleMassLimitReion)
-                  buffer[ind] += gal->EffectiveBHM;
-                else
-                  N_BlackHoleMassLimitReion += 1;
-              }
+              //              if (run_globals.params.physics.Flag_BHFeedback) {
+              //                if (gal->BlackHoleMass >= run_globals.params.physics.BlackHoleMassLimitReion)
+              //                  buffer[ind] += gal->EffectiveBHM;
+              //                else
+              //                  N_BlackHoleMassLimitReion += 1;
+              //              }
               break;
 
             case prop_sfr:
               buffer[ind] += gal->FescWeightedGSM;
               // for ionizing_source_formation_rate_grid, need further convertion due to different UV spectral index of
               // quasar and stellar component
-              if (run_globals.params.physics.Flag_BHFeedback)
-                if (gal->BlackHoleMass >= run_globals.params.physics.BlackHoleMassLimitReion)
-                  buffer[ind] += gal->EffectiveBHM * run_globals.params.physics.ReionAlphaUVBH /
-                                 run_globals.params.physics.ReionAlphaUV;
+              //              if (run_globals.params.physics.Flag_BHFeedback)
+              //                if (gal->BlackHoleMass >= run_globals.params.physics.BlackHoleMassLimitReion)
+              //                  buffer[ind] += gal->EffectiveBHM * run_globals.params.physics.ReionAlphaUVBH /
+              //                                 run_globals.params.physics.ReionAlphaUV;
               break;
 
             default:
@@ -1079,11 +1097,11 @@ void construct_baryon_grids(int snapshot, int local_ngals)
             ABORT(EXIT_FAILURE);
         }
     }
-    MPI_Allreduce(MPI_IN_PLACE, &N_BlackHoleMassLimitReion, 1, MPI_LONG, MPI_SUM, run_globals.mpi_comm);
-    mlog("%d quasars are smaller than %g",
-         MLOG_MESG,
-         N_BlackHoleMassLimitReion,
-         run_globals.params.physics.BlackHoleMassLimitReion);
+    //    MPI_Allreduce(MPI_IN_PLACE, &N_BlackHoleMassLimitReion, 1, MPI_LONG, MPI_SUM, run_globals.mpi_comm);
+    //    mlog("%d quasars are smaller than %g",
+    //         MLOG_MESG,
+    //         N_BlackHoleMassLimitReion,
+    //         run_globals.params.physics.BlackHoleMassLimitReion);
   }
 
   mlog("done", MLOG_CLOSE | MLOG_TIMERSTOP);
@@ -1234,151 +1252,151 @@ void save_reion_output_grids(int snapshot)
   hid_t dcpl_id = H5Pcreate(H5P_DATASET_CREATE);
   H5Pset_chunk(dcpl_id, 3, (hsize_t[3]){ 1, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim });
 
-  // // create and write the datasets
+  // create and write the datasets
   write_grid_float("xH", grids->xH, file_id, fspace_id, memspace_id, dcpl_id);
-  // write_grid_float("z_at_ionization", grids->z_at_ionization, file_id, fspace_id, memspace_id, dcpl_id);
+ // write_grid_float("z_at_ionization", grids->z_at_ionization, file_id, fspace_id, memspace_id, dcpl_id);
   // write_grid_float("r_bubble", grids->r_bubble, file_id, fspace_id, memspace_id, dcpl_id);
 
-  // if (run_globals.params.ReionUVBFlag) {
-  //   write_grid_float("J_21", grids->J_21, file_id, fspace_id, memspace_id, dcpl_id);
-  //   H5LTset_attribute_double(file_id, "J_21", "volume_weighted_global_J_21", &(grids->volume_weighted_global_J_21), 1);
-  //   write_grid_float("J_21_at_ionization", grids->J_21_at_ionization, file_id, fspace_id, memspace_id, dcpl_id);
-  //   write_grid_float("Mvir_crit", grids->Mvir_crit, file_id, fspace_id, memspace_id, dcpl_id);
-  // }
+//  if (run_globals.params.ReionUVBFlag) {
+ //   write_grid_float("J_21", grids->J_21, file_id, fspace_id, memspace_id, dcpl_id);
+  //  H5LTset_attribute_double(file_id, "J_21", "volume_weighted_global_J_21", &(grids->volume_weighted_global_J_21), 1);
+  //  write_grid_float("J_21_at_ionization", grids->J_21_at_ionization, file_id, fspace_id, memspace_id, dcpl_id);
+  //  write_grid_float("Mvir_crit", grids->Mvir_crit, file_id, fspace_id, memspace_id, dcpl_id);
+  //}
 
   // fftw padded grids
   float* grid = (float*)calloc((size_t)(local_nix * ReionGridDim * ReionGridDim), sizeof(float));
 
-  // if (run_globals.params.Flag_IncludeSpinTemp) {
-  //   write_grid_float("TS_box", grids->TS_box, file_id, fspace_id, memspace_id, dcpl_id);
-  //   write_grid_float("Tk_box", grids->Tk_box, file_id, fspace_id, memspace_id, dcpl_id);
+//  if (run_globals.params.Flag_IncludeSpinTemp) {
+//    write_grid_float("TS_box", grids->TS_box, file_id, fspace_id, memspace_id, dcpl_id);
+//    write_grid_float("Tk_box", grids->Tk_box, file_id, fspace_id, memspace_id, dcpl_id);
 
-  //   for (int ii = 0; ii < local_nix; ii++)
-  //     for (int jj = 0; jj < ReionGridDim; jj++)
-  //       for (int kk = 0; kk < ReionGridDim; kk++)
-  //         grid[grid_index(ii, jj, kk, ReionGridDim, INDEX_REAL)] =
-  //           (grids->x_e_box_prev)[grid_index(ii, jj, kk, ReionGridDim, INDEX_PADDED)];
+//    for (int ii = 0; ii < local_nix; ii++)
+//      for (int jj = 0; jj < ReionGridDim; jj++)
+//        for (int kk = 0; kk < ReionGridDim; kk++)
+//          grid[grid_index(ii, jj, kk, ReionGridDim, INDEX_REAL)] =
+//            (grids->x_e_box_prev)[grid_index(ii, jj, kk, ReionGridDim, INDEX_PADDED)];
 
-  //   write_grid_float("x_e_box", grid, file_id, fspace_id, memspace_id, dcpl_id);
-  // }
+ //   write_grid_float("x_e_box", grid, file_id, fspace_id, memspace_id, dcpl_id);
+ // }
 
   if (run_globals.params.Flag_Compute21cmBrightTemp) {
     write_grid_float("delta_T", grids->delta_T, file_id, fspace_id, memspace_id, dcpl_id);
   }
 
-  // if (run_globals.params.Flag_ConstructLightcone && run_globals.params.EndSnapshotLightcone == snapshot &&
-  //     snapshot != 0) {
+  if (run_globals.params.Flag_ConstructLightcone && run_globals.params.EndSnapshotLightcone == snapshot &&
+      snapshot != 0) {
 
-  //   // create the filespace
-  //   hsize_t dims_LC[3] = { (hsize_t)ReionGridDim, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
-  //   hid_t fspace_id_LC = H5Screate_simple(3, dims_LC, NULL);
+    // create the filespace
+    hsize_t dims_LC[3] = { (hsize_t)ReionGridDim, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
+    hid_t fspace_id_LC = H5Screate_simple(3, dims_LC, NULL);
 
-  //   // create the memspace
-  //   hsize_t mem_dims_LC[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
-  //   hid_t memspace_id_LC = H5Screate_simple(3, mem_dims_LC, NULL);
+    // create the memspace
+    hsize_t mem_dims_LC[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
+    hid_t memspace_id_LC = H5Screate_simple(3, mem_dims_LC, NULL);
 
-  //   // select a hyperslab in the filespace
-  //   hsize_t start_LC[3] = { (hsize_t)run_globals.reion_grids.slab_ix_start[run_globals.mpi_rank], 0, 0 };
-  //   hsize_t count_LC[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
-  //   H5Sselect_hyperslab(fspace_id_LC, H5S_SELECT_SET, start_LC, NULL, count_LC, NULL);
+    // select a hyperslab in the filespace
+    hsize_t start_LC[3] = { (hsize_t)run_globals.reion_grids.slab_ix_start[run_globals.mpi_rank], 0, 0 };
+    hsize_t count_LC[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
+    H5Sselect_hyperslab(fspace_id_LC, H5S_SELECT_SET, start_LC, NULL, count_LC, NULL);
 
-  //   // set the dataset creation property list to use chunking along x-axis
-  //   hid_t dcpl_id_LC = H5Pcreate(H5P_DATASET_CREATE);
-  //   H5Pset_chunk(dcpl_id_LC, 3, (hsize_t[3]){ 1, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength });
+    // set the dataset creation property list to use chunking along x-axis
+    hid_t dcpl_id_LC = H5Pcreate(H5P_DATASET_CREATE);
+    H5Pset_chunk(dcpl_id_LC, 3, (hsize_t[3]){ 1, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength });
 
-  //   mlog("Outputting light-cone", MLOG_MESG);
-  //   write_grid_float("LightconeBox", grids->LightconeBox, file_id, fspace_id_LC, memspace_id_LC, dcpl_id_LC);
+    mlog("Outputting light-cone", MLOG_MESG);
+    write_grid_float("LightconeBox", grids->LightconeBox, file_id, fspace_id_LC, memspace_id_LC, dcpl_id_LC);
 
-  //   // create the filespace
-  //   hsize_t dims_LCz[1] = { (hsize_t)run_globals.params.LightconeLength };
-  //   hid_t fspace_id_LCz = H5Screate_simple(1, dims_LCz, NULL);
+    // create the filespace
+    hsize_t dims_LCz[1] = { (hsize_t)run_globals.params.LightconeLength };
+    hid_t fspace_id_LCz = H5Screate_simple(1, dims_LCz, NULL);
 
-  //   // create the memspace
-  //   hsize_t mem_dims_LCz[1] = { (hsize_t)run_globals.params.LightconeLength };
-  //   hid_t memspace_id_LCz = H5Screate_simple(1, mem_dims_LCz, NULL);
+    // create the memspace
+    hsize_t mem_dims_LCz[1] = { (hsize_t)run_globals.params.LightconeLength };
+    hid_t memspace_id_LCz = H5Screate_simple(1, mem_dims_LCz, NULL);
 
-  //   hid_t dcpl_id_LCz = H5Pcreate(H5P_DATASET_CREATE);
-  //   hid_t dset_id =
-  //     H5Dcreate(file_id, "lightcone-z", H5T_NATIVE_FLOAT, fspace_id_LCz, H5P_DEFAULT, dcpl_id_LCz, H5P_DEFAULT);
+    hid_t dcpl_id_LCz = H5Pcreate(H5P_DATASET_CREATE);
+    hid_t dset_id =
+      H5Dcreate(file_id, "lightcone-z", H5T_NATIVE_FLOAT, fspace_id_LCz, H5P_DEFAULT, dcpl_id_LCz, H5P_DEFAULT);
 
-  //   plist_id = H5Pcreate(H5P_DATASET_XFER);
+    plist_id = H5Pcreate(H5P_DATASET_XFER);
 
-  //   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+    H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
-  //   // write the dataset
-  //   H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_LCz, fspace_id_LCz, plist_id, grids->Lightcone_redshifts);
+    // write the dataset
+    H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_LCz, fspace_id_LCz, plist_id, grids->Lightcone_redshifts);
 
-  //   // cleanup
-  //   H5Pclose(plist_id);
-  //   H5Dclose(dset_id);
-  // }
+    // cleanup
+    H5Pclose(plist_id);
+    H5Dclose(dset_id);
+  }
 
   H5LTset_attribute_double(file_id, "xH", "volume_weighted_global_xH", &(grids->volume_weighted_global_xH), 1);
   H5LTset_attribute_double(file_id, "xH", "mass_weighted_global_xH", &(grids->mass_weighted_global_xH), 1);
 
-  // if (run_globals.params.Flag_IncludeSpinTemp) {
-  //   H5LTset_attribute_double(file_id, "TS_box", "volume_ave_TS", &(grids->volume_ave_TS), 1);
-  //   H5LTset_attribute_double(file_id, "Tk_box", "volume_ave_TK", &(grids->volume_ave_TK), 1);
-  //   H5LTset_attribute_double(file_id, "x_e_box", "volume_ave_xe", &(grids->volume_ave_xe), 1);
+  if (run_globals.params.Flag_IncludeSpinTemp) {
+    H5LTset_attribute_double(file_id, "TS_box", "volume_ave_TS", &(grids->volume_ave_TS), 1);
+    H5LTset_attribute_double(file_id, "Tk_box", "volume_ave_TK", &(grids->volume_ave_TK), 1);
+    H5LTset_attribute_double(file_id, "x_e_box", "volume_ave_xe", &(grids->volume_ave_xe), 1);
 
-  //   H5LTset_attribute_double(file_id, "TS_box", "volume_ave_J_alpha", &(grids->volume_ave_J_alpha), 1);
-  //   H5LTset_attribute_double(file_id, "TS_box", "volume_ave_xalpha", &(grids->volume_ave_xalpha), 1);
-  //   H5LTset_attribute_double(file_id, "TS_box", "volume_ave_Xheat", &(grids->volume_ave_Xheat), 1);
-  //   H5LTset_attribute_double(file_id, "TS_box", "volume_ave_Xion", &(grids->volume_ave_Xion), 1);
-  // }
+    H5LTset_attribute_double(file_id, "TS_box", "volume_ave_J_alpha", &(grids->volume_ave_J_alpha), 1);
+    H5LTset_attribute_double(file_id, "TS_box", "volume_ave_xalpha", &(grids->volume_ave_xalpha), 1);
+    H5LTset_attribute_double(file_id, "TS_box", "volume_ave_Xheat", &(grids->volume_ave_Xheat), 1);
+    H5LTset_attribute_double(file_id, "TS_box", "volume_ave_Xion", &(grids->volume_ave_Xion), 1);
+  }
 
   if (run_globals.params.Flag_Compute21cmBrightTemp) {
     H5LTset_attribute_double(file_id, "delta_T", "volume_ave_Tb", &(grids->volume_ave_Tb), 1);
   }
 
-  // if (run_globals.params.Flag_ComputePS) {
+  if (run_globals.params.Flag_ComputePS) {
 
-  //   // create the filespace
-  //   hsize_t dims_PS[1] = { (hsize_t)run_globals.params.PS_Length };
-  //   hid_t fspace_id_PS = H5Screate_simple(1, dims_PS, NULL);
+    // create the filespace
+    hsize_t dims_PS[1] = { (hsize_t)run_globals.params.PS_Length };
+    hid_t fspace_id_PS = H5Screate_simple(1, dims_PS, NULL);
 
-  //   // create the memspace
-  //   hsize_t mem_dims_PS[1] = { (hsize_t)run_globals.params.PS_Length };
-  //   hid_t memspace_id_PS = H5Screate_simple(1, mem_dims_PS, NULL);
+    // create the memspace
+    hsize_t mem_dims_PS[1] = { (hsize_t)run_globals.params.PS_Length };
+    hid_t memspace_id_PS = H5Screate_simple(1, mem_dims_PS, NULL);
 
-  //   hid_t dcpl_id_PS = H5Pcreate(H5P_DATASET_CREATE);
-  //   hid_t dset_id = H5Dcreate(file_id, "k_bins", H5T_NATIVE_FLOAT, fspace_id_PS, H5P_DEFAULT, dcpl_id_PS, H5P_DEFAULT);
+    hid_t dcpl_id_PS = H5Pcreate(H5P_DATASET_CREATE);
+    hid_t dset_id = H5Dcreate(file_id, "k_bins", H5T_NATIVE_FLOAT, fspace_id_PS, H5P_DEFAULT, dcpl_id_PS, H5P_DEFAULT);
 
-  //   plist_id = H5Pcreate(H5P_DATASET_XFER);
+    plist_id = H5Pcreate(H5P_DATASET_XFER);
 
-  //   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+    H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
-  //   // write the dataset
-  //   H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_PS, fspace_id_PS, plist_id, grids->PS_k);
+    // write the dataset
+    H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_PS, fspace_id_PS, plist_id, grids->PS_k);
 
-  //   // cleanup
-  //   H5Pclose(plist_id);
-  //   H5Dclose(dset_id);
+    // cleanup
+    H5Pclose(plist_id);
+    H5Dclose(dset_id);
 
-  //   dset_id = H5Dcreate(file_id, "PS_data", H5T_NATIVE_FLOAT, fspace_id_PS, H5P_DEFAULT, dcpl_id_PS, H5P_DEFAULT);
+    dset_id = H5Dcreate(file_id, "PS_data", H5T_NATIVE_FLOAT, fspace_id_PS, H5P_DEFAULT, dcpl_id_PS, H5P_DEFAULT);
 
-  //   plist_id = H5Pcreate(H5P_DATASET_XFER);
+    plist_id = H5Pcreate(H5P_DATASET_XFER);
 
-  //   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+    H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
-  //   H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_PS, fspace_id_PS, plist_id, grids->PS_data);
+    H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_PS, fspace_id_PS, plist_id, grids->PS_data);
 
-  //   // cleanup
-  //   H5Pclose(plist_id);
-  //   H5Dclose(dset_id);
+    // cleanup
+    H5Pclose(plist_id);
+    H5Dclose(dset_id);
 
-  //   dset_id = H5Dcreate(file_id, "PS_error", H5T_NATIVE_FLOAT, fspace_id_PS, H5P_DEFAULT, dcpl_id_PS, H5P_DEFAULT);
+    dset_id = H5Dcreate(file_id, "PS_error", H5T_NATIVE_FLOAT, fspace_id_PS, H5P_DEFAULT, dcpl_id_PS, H5P_DEFAULT);
 
-  //   plist_id = H5Pcreate(H5P_DATASET_XFER);
+    plist_id = H5Pcreate(H5P_DATASET_XFER);
 
-  //   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+    H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
-  //   H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_PS, fspace_id_PS, plist_id, grids->PS_error);
+    H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_PS, fspace_id_PS, plist_id, grids->PS_error);
 
-  //   // cleanup
-  //   H5Pclose(plist_id);
-  //   H5Dclose(dset_id);
-  // }
+    // cleanup
+    H5Pclose(plist_id);
+    H5Dclose(dset_id);
+  }
 
   // tidy up
   free(grid);
@@ -1510,7 +1528,8 @@ void filter(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim, f
   } // End looping through k box
 }
 
-void velocity_gradient(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim)
+//void velocity_gradient(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim)
+void velocity_gradient(fftwf_complex* box, int slab_nx, int grid_dim)
 {
   int middle = grid_dim / 2;
   float box_size = (float)run_globals.params.BoxSize;
