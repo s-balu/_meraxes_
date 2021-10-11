@@ -158,11 +158,12 @@ void read_trees__velociraptor(int snapshot,
 
     // check the units
     H5LTget_attribute_double(fd, "Header/Units", "Mass_unit_to_solarmass", &mass_unit_to_internal);
+    mass_unit_to_internal /= 1.0e10;
     H5LTget_attribute_double(fd, snap_group_name, "scalefactor", &scale_factor);
   }
-  mass_unit_to_internal /= 1.0e10;
 
   MPI_Bcast(&n_tree_entries, 1, MPI_INT, 0, run_globals.mpi_comm);
+  MPI_Bcast(&mass_unit_to_internal, 1, MPI_DOUBLE, 0, run_globals.mpi_comm);
 
   int n_read = 0;
   int n_to_read = buffer_size > n_tree_entries ? n_tree_entries : buffer_size;
