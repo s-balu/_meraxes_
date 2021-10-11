@@ -197,7 +197,7 @@ void call_find_HII_bubbles(int snapshot, int nout_gals, timer_info* timer)
 //		        save_reion_input_grids(snapshot);
 //			}
 //		}
-	}
+	// }
   }
 
   mlog("...done", MLOG_CLOSE);
