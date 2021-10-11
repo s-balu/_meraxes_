@@ -982,7 +982,7 @@ void write_snapshot(int n_write, int i_out, int* last_n_write)
 		  // if (i_out == snapshots[ii]){
 		    save_reion_output_grids(run_globals.ListOutputSnaps[i_out]);
 		  // }
-	  }
+	  // }
   }
 
   // Close the group.
