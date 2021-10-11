@@ -768,13 +768,13 @@ void write_snapshot(int n_write, int i_out, int* last_n_write)
   char target_group[20];
   galaxy_t* gal = NULL;
   hdf5_output_t h5props = run_globals.hdf5props_snip;
-  int snapshots[12] = {48, 58, 75, 82, 86, 90, 94, 98, 103, 108, 113, 119};
-  for (int ii = 0; ii < 12; ii++){
-      if (i_out == snapshots[ii]){
-          h5props = run_globals.hdf5props;
-		  break;
-      }
-  }
+  // int snapshots[12] = {48, 58, 75, 82, 86, 90, 94, 98, 103, 108, 113, 119};
+  // for (int ii = 0; ii < 12; ii++){
+  //     if (i_out == snapshots[ii]){
+  //         h5props = run_globals.hdf5props;
+	// 	  break;
+  //     }
+  // }
   int gal_count = 0;
   int old_count = 0;
   int* first_progenitor_index = NULL;
@@ -978,10 +978,10 @@ void write_snapshot(int n_write, int i_out, int* last_n_write)
 
   if (run_globals.params.Flag_PatchyReion && check_if_reionization_ongoing(run_globals.ListOutputSnaps[i_out]) &&
       (run_globals.params.Flag_OutputGrids)){
-	  for (int ii = 0; ii < 12; ii++){
-		  if (i_out == snapshots[ii]){
+	  // for (int ii = 0; ii < 12; ii++){
+		  // if (i_out == snapshots[ii]){
 		    save_reion_output_grids(run_globals.ListOutputSnaps[i_out]);
-		  }
+		  // }
 	  }
   }
 
