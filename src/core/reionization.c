@@ -18,9 +18,8 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
 {
   physics_params_t* params = &(run_globals.params.physics);
 
-  // float fesc_bh = (float)(params->EscapeFracBHNorm *
-  //                         (powf((float)((1.0 + run_globals.ZZ[snapshot]) / 6.0),
-  //                         (float)params->EscapeFracBHScaling)));
+  float fesc_bh = (float)(params->EscapeFracBHNorm *
+                          (powf((float)((1.0 + run_globals.ZZ[snapshot]) / 6.0), (float)params->EscapeFracBHScaling)));
 
   double fesc = params->EscapeFracNorm;
 
@@ -28,8 +27,7 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
   if ((params->EscapeFracDependency > 0) && (params->EscapeFracDependency <= 6))
     if (params->EscapeFracRedshiftScaling != 0.0)
       fesc *=
-        2.0 /
-        (1.0 + exp(params->EscapeFracRedshiftScaling * (run_globals.ZZ[snapshot] - params->EscapeFracRedshiftOffset)));
+        pow((1.0 + run_globals.ZZ[snapshot]) / params->EscapeFracRedshiftOffset, params->EscapeFracRedshiftScaling);
 
   // galaxy properties
   switch (params->EscapeFracDependency) {
@@ -50,14 +48,14 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
       else
         fesc = 0.0;
       break;
-    /*case 4: // cold gas density (Msun / pc^2)
+    case 4: // cold gas density (Msun / pc^2)
       if ((gal->ColdGas > 0.0) && (gal->DiskScaleLength > 0.0))
         fesc *=
           pow((gal->ColdGas / gal->DiskScaleLength / gal->DiskScaleLength * 0.01 * run_globals.params.Hubble_h) / 10.,
               params->EscapeFracPropScaling);
       else
         fesc = 1.0;
-      break;*/
+      break;
     case 5: // halo mass (1e9 Msun)
       if (gal->Mvir > 0.0)
         fesc *= pow(gal->Mvir * 10. / run_globals.params.Hubble_h, params->EscapeFracPropScaling);
@@ -80,11 +78,11 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
   else if (fesc < 0.0)
     fesc = 0.0;
 
-  /*  if (fesc_bh > 1.0)
-      fesc_bh = 1.0;
-    else if (fesc_bh < 0.0)
-      fesc_bh = 0.0;
-  */
+  if (fesc_bh > 1.0)
+    fesc_bh = 1.0;
+  else if (fesc_bh < 0.0)
+    fesc_bh = 0.0;
+
   gal->Fesc = fesc;
   gal->FescWeightedGSM += new_stars * fesc;
 
@@ -97,7 +95,7 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
   // here.  It's confusing I know.  I intend to re-write this to make things
   // more obvious at some point in the future.
   // TODO(smutch): Check this all out and ensure that it is valid for reidentified ghosts
-  //  gal->FescBH = fesc_bh;
+  gal->FescBH = fesc_bh;
 }
 
 void set_quasar_fobs()
@@ -165,8 +163,6 @@ void call_find_HII_bubbles(int snapshot, int nout_gals, timer_info* timer)
 {
   // Thin wrapper round find_HII_bubbles
 
-  int snapshots[12] = {48, 58, 75, 82, 86, 90, 94, 98, 103, 108, 113, 119};
-
   int total_n_out_gals = 0;
 
   reion_grids_t* grids = &(run_globals.reion_grids);
@@ -190,14 +186,9 @@ void call_find_HII_bubbles(int snapshot, int nout_gals, timer_info* timer)
     read_grid(DENSITY, snapshot, grids->deltax);
 
     // save the grids prior to doing FFTs to avoid precision loss and aliasing etc.
-    for (int i_out = 0; i_out < run_globals.NOutputSnaps; i_out++){
+    for (int i_out = 0; i_out < run_globals.NOutputSnaps; i_out++)
       if (snapshot == run_globals.ListOutputSnaps[i_out] && run_globals.params.Flag_OutputGrids)
-		for (int ii = 0; ii < 12; ii++){
-			if (i_out == snapshots[ii]){
-		        save_reion_input_grids(snapshot);
-			}
-		}
-	}
+        save_reion_input_grids(snapshot);
   }
 
   mlog("...done", MLOG_CLOSE);
@@ -389,6 +380,8 @@ void init_reion_grids()
 
 void malloc_reionization_grids()
 {
+  mlog("Allocating reionization grids...", MLOG_OPEN);
+
   reion_grids_t* grids = &(run_globals.reion_grids);
 
   fftwf_mpi_init();
@@ -413,7 +406,7 @@ void malloc_reionization_grids()
       } else {
         mlog("FFTW3 wisdom directory provided, but no suitable wisdom exists. New wisdom will be created (this make "
              "take a while).",
-             MLOG_MESG);
+             MLOG_MESG | MLOG_FLUSH);
         save_wisdom = true;
         // Check to see if the wisdom directory exists and if not, create it
         struct stat filestatus;
@@ -677,6 +670,8 @@ void malloc_reionization_grids()
     }
 
   } // if (run_globals.params.Flag_PatchyReion)
+
+  mlog("...done", MLOG_CLOSE);
 }
 
 void free_reionization_grids()
@@ -988,7 +983,7 @@ void construct_baryon_grids(int snapshot, int local_ngals)
   for (int prop = prop_stellar; prop <= prop_sfr; prop++) {
     int i_gal = 0;
     int skipped_gals = 0;
-    //    long N_BlackHoleMassLimitReion = 0;
+    long N_BlackHoleMassLimitReion = 0;
 
     for (int i_r = 0; i_r < run_globals.mpi_size; i_r++) {
       // init the buffer
@@ -1032,22 +1027,22 @@ void construct_baryon_grids(int snapshot, int local_ngals)
 
               buffer[ind] += gal->FescWeightedGSM;
               // a trick to include quasar radiation using current 21cmFAST code
-              //              if (run_globals.params.physics.Flag_BHFeedback) {
-              //                if (gal->BlackHoleMass >= run_globals.params.physics.BlackHoleMassLimitReion)
-              //                  buffer[ind] += gal->EffectiveBHM;
-              //                else
-              //                  N_BlackHoleMassLimitReion += 1;
-              //              }
+              if (run_globals.params.physics.Flag_BHFeedback) {
+                if (gal->BlackHoleMass >= run_globals.params.physics.BlackHoleMassLimitReion)
+                  buffer[ind] += gal->EffectiveBHM;
+                else
+                  N_BlackHoleMassLimitReion += 1;
+              }
               break;
 
             case prop_sfr:
               buffer[ind] += gal->FescWeightedGSM;
               // for ionizing_source_formation_rate_grid, need further convertion due to different UV spectral index of
               // quasar and stellar component
-              //              if (run_globals.params.physics.Flag_BHFeedback)
-              //                if (gal->BlackHoleMass >= run_globals.params.physics.BlackHoleMassLimitReion)
-              //                  buffer[ind] += gal->EffectiveBHM * run_globals.params.physics.ReionAlphaUVBH /
-              //                                 run_globals.params.physics.ReionAlphaUV;
+              if (run_globals.params.physics.Flag_BHFeedback)
+                if (gal->BlackHoleMass >= run_globals.params.physics.BlackHoleMassLimitReion)
+                  buffer[ind] += gal->EffectiveBHM * run_globals.params.physics.ReionAlphaUVBH /
+                                 run_globals.params.physics.ReionAlphaUV;
               break;
 
             default:
@@ -1097,11 +1092,11 @@ void construct_baryon_grids(int snapshot, int local_ngals)
             ABORT(EXIT_FAILURE);
         }
     }
-    //    MPI_Allreduce(MPI_IN_PLACE, &N_BlackHoleMassLimitReion, 1, MPI_LONG, MPI_SUM, run_globals.mpi_comm);
-    //    mlog("%d quasars are smaller than %g",
-    //         MLOG_MESG,
-    //         N_BlackHoleMassLimitReion,
-    //         run_globals.params.physics.BlackHoleMassLimitReion);
+    MPI_Allreduce(MPI_IN_PLACE, &N_BlackHoleMassLimitReion, 1, MPI_LONG, MPI_SUM, run_globals.mpi_comm);
+    mlog("%d quasars are smaller than %g",
+         MLOG_MESG,
+         N_BlackHoleMassLimitReion,
+         run_globals.params.physics.BlackHoleMassLimitReion);
   }
 
   mlog("done", MLOG_CLOSE | MLOG_TIMERSTOP);
@@ -1528,8 +1523,7 @@ void filter(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim, f
   } // End looping through k box
 }
 
-//void velocity_gradient(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim)
-void velocity_gradient(fftwf_complex* box, int slab_nx, int grid_dim)
+void velocity_gradient(fftwf_complex* box, int local_ix_start, int slab_nx, int grid_dim)
 {
   int middle = grid_dim / 2;
   float box_size = (float)run_globals.params.BoxSize;
