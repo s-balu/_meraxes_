@@ -5,7 +5,6 @@
 #include <hdf5_hl.h>
 #include <math.h>
 #include <sys/stat.h>
-
 #include "ComputeTs.h"
 #include "find_HII_bubbles.h"
 #include "meraxes.h"
@@ -13,13 +12,13 @@
 #include "read_grids.h"
 #include "reionization.h"
 #include "virial_properties.h"
-
 void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
 {
   physics_params_t* params = &(run_globals.params.physics);
 
-  float fesc_bh = (float)(params->EscapeFracBHNorm *
-                          (powf((float)((1.0 + run_globals.ZZ[snapshot]) / 6.0), (float)params->EscapeFracBHScaling)));
+  // float fesc_bh = (float)(params->EscapeFracBHNorm *
+  //                         (powf((float)((1.0 + run_globals.ZZ[snapshot]) / 6.0),
+  //                         (float)params->EscapeFracBHScaling)));
 
   double fesc = params->EscapeFracNorm;
 
@@ -27,7 +26,8 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
   if ((params->EscapeFracDependency > 0) && (params->EscapeFracDependency <= 6))
     if (params->EscapeFracRedshiftScaling != 0.0)
       fesc *=
-        pow((1.0 + run_globals.ZZ[snapshot]) / params->EscapeFracRedshiftOffset, params->EscapeFracRedshiftScaling);
+        2.0 /
+        (1.0 + exp(params->EscapeFracRedshiftScaling * (run_globals.ZZ[snapshot] - params->EscapeFracRedshiftOffset)));
 
   // galaxy properties
   switch (params->EscapeFracDependency) {
@@ -48,14 +48,14 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
       else
         fesc = 0.0;
       break;
-    case 4: // cold gas density (Msun / pc^2)
+    /*case 4: // cold gas density (Msun / pc^2)
       if ((gal->ColdGas > 0.0) && (gal->DiskScaleLength > 0.0))
         fesc *=
           pow((gal->ColdGas / gal->DiskScaleLength / gal->DiskScaleLength * 0.01 * run_globals.params.Hubble_h) / 10.,
               params->EscapeFracPropScaling);
       else
         fesc = 1.0;
-      break;
+      break;*/
     case 5: // halo mass (1e9 Msun)
       if (gal->Mvir > 0.0)
         fesc *= pow(gal->Mvir * 10. / run_globals.params.Hubble_h, params->EscapeFracPropScaling);
@@ -72,17 +72,16 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
     default:
       mlog_error("Unrecognised EscapeFracDependency parameter value.");
   }
-
   if (fesc > 1.0)
     fesc = 1.0;
   else if (fesc < 0.0)
     fesc = 0.0;
 
-  if (fesc_bh > 1.0)
-    fesc_bh = 1.0;
-  else if (fesc_bh < 0.0)
-    fesc_bh = 0.0;
-
+  /*  if (fesc_bh > 1.0)
+      fesc_bh = 1.0;
+    else if (fesc_bh < 0.0)
+      fesc_bh = 0.0;
+  */
   gal->Fesc = fesc;
   gal->FescWeightedGSM += new_stars * fesc;
 
@@ -95,67 +94,55 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
   // here.  It's confusing I know.  I intend to re-write this to make things
   // more obvious at some point in the future.
   // TODO(smutch): Check this all out and ensure that it is valid for reidentified ghosts
-  gal->FescBH = fesc_bh;
+  //  gal->FescBH = fesc_bh;
 }
 
 void set_quasar_fobs()
 {
   physics_params_t* params = &(run_globals.params.physics);
-
   params->quasar_fobs = 1. - cos(params->quasar_open_angle / 180. * M_PI / 2.);
   mlog("Quasar radiation open angle is set to be %g, corresponding to an obscure fraction of %g",
        MLOG_MESG | MLOG_FLUSH,
        params->quasar_open_angle,
        params->quasar_fobs);
 }
-
 void set_ReionEfficiency()
 {
   // Use the params passed to Meraxes via the input file to set the HII ionising efficiency factor
   physics_params_t* params = &(run_globals.params.physics);
-
   // The following is based on Sobacchi & Messinger (2013) eqn 7
   // with f_* removed and f_b added since we define f_coll as M_*/M_tot rather than M_vir/M_tot,
   // and also with the inclusion of the effects of the Helium fraction.
   params->ReionEfficiency =
     1.0 / run_globals.params.BaryonFrac * params->ReionNionPhotPerBary / (1.0 - 0.75 * params->Y_He);
-
   // Account for instantaneous recycling factor so that stellar mass is cumulative
   if (params->Flag_IRA)
     params->ReionEfficiency /= params->SfRecycleFraction;
-
   mlog("Set value of run_globals.params.ReionEfficiency = %g", MLOG_MESG, params->ReionEfficiency);
 }
-
 void assign_slabs()
 {
   mlog("Assigning slabs to MPI cores...", MLOG_OPEN);
-
   // Assign the slab size
   int n_rank = run_globals.mpi_size;
   int dim = run_globals.params.ReionGridDim;
-
   // Use fftw to find out what slab each rank should get
   ptrdiff_t local_nix, local_ix_start;
   ptrdiff_t local_n_complex =
     fftwf_mpi_local_size_3d(dim, dim, dim / 2 + 1, run_globals.mpi_comm, &local_nix, &local_ix_start);
-
   // let every core know...
   ptrdiff_t** slab_nix = &run_globals.reion_grids.slab_nix;
   *slab_nix = malloc(sizeof(ptrdiff_t) * n_rank); ///< array of number of x cells of every rank
   MPI_Allgather(&local_nix, sizeof(ptrdiff_t), MPI_BYTE, *slab_nix, sizeof(ptrdiff_t), MPI_BYTE, run_globals.mpi_comm);
-
   ptrdiff_t** slab_ix_start = &run_globals.reion_grids.slab_ix_start;
   *slab_ix_start = malloc(sizeof(ptrdiff_t) * n_rank); ///< array first x cell of every rank
   (*slab_ix_start)[0] = 0;
   for (int ii = 1; ii < n_rank; ii++)
     (*slab_ix_start)[ii] = (*slab_ix_start)[ii - 1] + (*slab_nix)[ii - 1];
-
   ptrdiff_t** slab_n_complex = &run_globals.reion_grids.slab_n_complex; ///< array of allocation counts for every rank
   *slab_n_complex = malloc(sizeof(ptrdiff_t) * n_rank);                 ///< array of allocation counts for every rank
   MPI_Allgather(
     &local_n_complex, sizeof(ptrdiff_t), MPI_BYTE, *slab_n_complex, sizeof(ptrdiff_t), MPI_BYTE, run_globals.mpi_comm);
-
   mlog("...done", MLOG_CLOSE);
 }
 
