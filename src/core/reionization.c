@@ -1284,119 +1284,119 @@ void save_reion_output_grids(int snapshot)
     write_grid_float("delta_T", grids->delta_T, file_id, fspace_id, memspace_id, dcpl_id);
   }
 
-  if (run_globals.params.Flag_ConstructLightcone && run_globals.params.EndSnapshotLightcone == snapshot &&
-      snapshot != 0) {
+  // if (run_globals.params.Flag_ConstructLightcone && run_globals.params.EndSnapshotLightcone == snapshot &&
+  //     snapshot != 0) {
 
-    // create the filespace
-    hsize_t dims_LC[3] = { (hsize_t)ReionGridDim, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
-    hid_t fspace_id_LC = H5Screate_simple(3, dims_LC, NULL);
+  //   // create the filespace
+  //   hsize_t dims_LC[3] = { (hsize_t)ReionGridDim, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
+  //   hid_t fspace_id_LC = H5Screate_simple(3, dims_LC, NULL);
 
-    // create the memspace
-    hsize_t mem_dims_LC[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
-    hid_t memspace_id_LC = H5Screate_simple(3, mem_dims_LC, NULL);
+  //   // create the memspace
+  //   hsize_t mem_dims_LC[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
+  //   hid_t memspace_id_LC = H5Screate_simple(3, mem_dims_LC, NULL);
 
-    // select a hyperslab in the filespace
-    hsize_t start_LC[3] = { (hsize_t)run_globals.reion_grids.slab_ix_start[run_globals.mpi_rank], 0, 0 };
-    hsize_t count_LC[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
-    H5Sselect_hyperslab(fspace_id_LC, H5S_SELECT_SET, start_LC, NULL, count_LC, NULL);
+  //   // select a hyperslab in the filespace
+  //   hsize_t start_LC[3] = { (hsize_t)run_globals.reion_grids.slab_ix_start[run_globals.mpi_rank], 0, 0 };
+  //   hsize_t count_LC[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
+  //   H5Sselect_hyperslab(fspace_id_LC, H5S_SELECT_SET, start_LC, NULL, count_LC, NULL);
 
-    // set the dataset creation property list to use chunking along x-axis
-    hid_t dcpl_id_LC = H5Pcreate(H5P_DATASET_CREATE);
-    H5Pset_chunk(dcpl_id_LC, 3, (hsize_t[3]){ 1, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength });
+  //   // set the dataset creation property list to use chunking along x-axis
+  //   hid_t dcpl_id_LC = H5Pcreate(H5P_DATASET_CREATE);
+  //   H5Pset_chunk(dcpl_id_LC, 3, (hsize_t[3]){ 1, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength });
 
-    mlog("Outputting light-cone", MLOG_MESG);
-    write_grid_float("LightconeBox", grids->LightconeBox, file_id, fspace_id_LC, memspace_id_LC, dcpl_id_LC);
+  //   mlog("Outputting light-cone", MLOG_MESG);
+  //   write_grid_float("LightconeBox", grids->LightconeBox, file_id, fspace_id_LC, memspace_id_LC, dcpl_id_LC);
 
-    // create the filespace
-    hsize_t dims_LCz[1] = { (hsize_t)run_globals.params.LightconeLength };
-    hid_t fspace_id_LCz = H5Screate_simple(1, dims_LCz, NULL);
+  //   // create the filespace
+  //   hsize_t dims_LCz[1] = { (hsize_t)run_globals.params.LightconeLength };
+  //   hid_t fspace_id_LCz = H5Screate_simple(1, dims_LCz, NULL);
 
-    // create the memspace
-    hsize_t mem_dims_LCz[1] = { (hsize_t)run_globals.params.LightconeLength };
-    hid_t memspace_id_LCz = H5Screate_simple(1, mem_dims_LCz, NULL);
+  //   // create the memspace
+  //   hsize_t mem_dims_LCz[1] = { (hsize_t)run_globals.params.LightconeLength };
+  //   hid_t memspace_id_LCz = H5Screate_simple(1, mem_dims_LCz, NULL);
 
-    hid_t dcpl_id_LCz = H5Pcreate(H5P_DATASET_CREATE);
-    hid_t dset_id =
-      H5Dcreate(file_id, "lightcone-z", H5T_NATIVE_FLOAT, fspace_id_LCz, H5P_DEFAULT, dcpl_id_LCz, H5P_DEFAULT);
+  //   hid_t dcpl_id_LCz = H5Pcreate(H5P_DATASET_CREATE);
+  //   hid_t dset_id =
+  //     H5Dcreate(file_id, "lightcone-z", H5T_NATIVE_FLOAT, fspace_id_LCz, H5P_DEFAULT, dcpl_id_LCz, H5P_DEFAULT);
 
-    plist_id = H5Pcreate(H5P_DATASET_XFER);
+  //   plist_id = H5Pcreate(H5P_DATASET_XFER);
 
-    H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+  //   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
-    // write the dataset
-    H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_LCz, fspace_id_LCz, plist_id, grids->Lightcone_redshifts);
+  //   // write the dataset
+  //   H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_LCz, fspace_id_LCz, plist_id, grids->Lightcone_redshifts);
 
-    // cleanup
-    H5Pclose(plist_id);
-    H5Dclose(dset_id);
-  }
+  //   // cleanup
+  //   H5Pclose(plist_id);
+  //   H5Dclose(dset_id);
+  // }
 
   H5LTset_attribute_double(file_id, "xH", "volume_weighted_global_xH", &(grids->volume_weighted_global_xH), 1);
   H5LTset_attribute_double(file_id, "xH", "mass_weighted_global_xH", &(grids->mass_weighted_global_xH), 1);
 
-  if (run_globals.params.Flag_IncludeSpinTemp) {
-    H5LTset_attribute_double(file_id, "TS_box", "volume_ave_TS", &(grids->volume_ave_TS), 1);
-    H5LTset_attribute_double(file_id, "Tk_box", "volume_ave_TK", &(grids->volume_ave_TK), 1);
-    H5LTset_attribute_double(file_id, "x_e_box", "volume_ave_xe", &(grids->volume_ave_xe), 1);
+  // if (run_globals.params.Flag_IncludeSpinTemp) {
+  //   H5LTset_attribute_double(file_id, "TS_box", "volume_ave_TS", &(grids->volume_ave_TS), 1);
+  //   H5LTset_attribute_double(file_id, "Tk_box", "volume_ave_TK", &(grids->volume_ave_TK), 1);
+  //   H5LTset_attribute_double(file_id, "x_e_box", "volume_ave_xe", &(grids->volume_ave_xe), 1);
 
-    H5LTset_attribute_double(file_id, "TS_box", "volume_ave_J_alpha", &(grids->volume_ave_J_alpha), 1);
-    H5LTset_attribute_double(file_id, "TS_box", "volume_ave_xalpha", &(grids->volume_ave_xalpha), 1);
-    H5LTset_attribute_double(file_id, "TS_box", "volume_ave_Xheat", &(grids->volume_ave_Xheat), 1);
-    H5LTset_attribute_double(file_id, "TS_box", "volume_ave_Xion", &(grids->volume_ave_Xion), 1);
-  }
+  //   H5LTset_attribute_double(file_id, "TS_box", "volume_ave_J_alpha", &(grids->volume_ave_J_alpha), 1);
+  //   H5LTset_attribute_double(file_id, "TS_box", "volume_ave_xalpha", &(grids->volume_ave_xalpha), 1);
+  //   H5LTset_attribute_double(file_id, "TS_box", "volume_ave_Xheat", &(grids->volume_ave_Xheat), 1);
+  //   H5LTset_attribute_double(file_id, "TS_box", "volume_ave_Xion", &(grids->volume_ave_Xion), 1);
+  // }
 
   if (run_globals.params.Flag_Compute21cmBrightTemp) {
     H5LTset_attribute_double(file_id, "delta_T", "volume_ave_Tb", &(grids->volume_ave_Tb), 1);
   }
 
-  if (run_globals.params.Flag_ComputePS) {
+  // if (run_globals.params.Flag_ComputePS) {
 
-    // create the filespace
-    hsize_t dims_PS[1] = { (hsize_t)run_globals.params.PS_Length };
-    hid_t fspace_id_PS = H5Screate_simple(1, dims_PS, NULL);
+  //   // create the filespace
+  //   hsize_t dims_PS[1] = { (hsize_t)run_globals.params.PS_Length };
+  //   hid_t fspace_id_PS = H5Screate_simple(1, dims_PS, NULL);
 
-    // create the memspace
-    hsize_t mem_dims_PS[1] = { (hsize_t)run_globals.params.PS_Length };
-    hid_t memspace_id_PS = H5Screate_simple(1, mem_dims_PS, NULL);
+  //   // create the memspace
+  //   hsize_t mem_dims_PS[1] = { (hsize_t)run_globals.params.PS_Length };
+  //   hid_t memspace_id_PS = H5Screate_simple(1, mem_dims_PS, NULL);
 
-    hid_t dcpl_id_PS = H5Pcreate(H5P_DATASET_CREATE);
-    hid_t dset_id = H5Dcreate(file_id, "k_bins", H5T_NATIVE_FLOAT, fspace_id_PS, H5P_DEFAULT, dcpl_id_PS, H5P_DEFAULT);
+  //   hid_t dcpl_id_PS = H5Pcreate(H5P_DATASET_CREATE);
+  //   hid_t dset_id = H5Dcreate(file_id, "k_bins", H5T_NATIVE_FLOAT, fspace_id_PS, H5P_DEFAULT, dcpl_id_PS, H5P_DEFAULT);
 
-    plist_id = H5Pcreate(H5P_DATASET_XFER);
+  //   plist_id = H5Pcreate(H5P_DATASET_XFER);
 
-    H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+  //   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
-    // write the dataset
-    H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_PS, fspace_id_PS, plist_id, grids->PS_k);
+  //   // write the dataset
+  //   H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_PS, fspace_id_PS, plist_id, grids->PS_k);
 
-    // cleanup
-    H5Pclose(plist_id);
-    H5Dclose(dset_id);
+  //   // cleanup
+  //   H5Pclose(plist_id);
+  //   H5Dclose(dset_id);
 
-    dset_id = H5Dcreate(file_id, "PS_data", H5T_NATIVE_FLOAT, fspace_id_PS, H5P_DEFAULT, dcpl_id_PS, H5P_DEFAULT);
+  //   dset_id = H5Dcreate(file_id, "PS_data", H5T_NATIVE_FLOAT, fspace_id_PS, H5P_DEFAULT, dcpl_id_PS, H5P_DEFAULT);
 
-    plist_id = H5Pcreate(H5P_DATASET_XFER);
+  //   plist_id = H5Pcreate(H5P_DATASET_XFER);
 
-    H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+  //   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
-    H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_PS, fspace_id_PS, plist_id, grids->PS_data);
+  //   H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_PS, fspace_id_PS, plist_id, grids->PS_data);
 
-    // cleanup
-    H5Pclose(plist_id);
-    H5Dclose(dset_id);
+  //   // cleanup
+  //   H5Pclose(plist_id);
+  //   H5Dclose(dset_id);
 
-    dset_id = H5Dcreate(file_id, "PS_error", H5T_NATIVE_FLOAT, fspace_id_PS, H5P_DEFAULT, dcpl_id_PS, H5P_DEFAULT);
+  //   dset_id = H5Dcreate(file_id, "PS_error", H5T_NATIVE_FLOAT, fspace_id_PS, H5P_DEFAULT, dcpl_id_PS, H5P_DEFAULT);
 
-    plist_id = H5Pcreate(H5P_DATASET_XFER);
+  //   plist_id = H5Pcreate(H5P_DATASET_XFER);
 
-    H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+  //   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
-    H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_PS, fspace_id_PS, plist_id, grids->PS_error);
+  //   H5Dwrite(dset_id, H5T_NATIVE_FLOAT, memspace_id_PS, fspace_id_PS, plist_id, grids->PS_error);
 
-    // cleanup
-    H5Pclose(plist_id);
-    H5Dclose(dset_id);
-  }
+  //   // cleanup
+  //   H5Pclose(plist_id);
+  //   H5Dclose(dset_id);
+  // }
 
   // tidy up
   free(grid);
