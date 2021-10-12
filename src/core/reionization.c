@@ -25,11 +25,11 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
   double fesc = params->EscapeFracNorm;
 
   // redshift
+  
   if ((params->EscapeFracDependency > 0) && (params->EscapeFracDependency <= 6))
     if (params->EscapeFracRedshiftScaling != 0.0)
       fesc *=
-        2.0 /
-        (1.0 + exp(params->EscapeFracRedshiftScaling * (run_globals.ZZ[snapshot] - params->EscapeFracRedshiftOffset)));
+        pow((1.0 + run_globals.ZZ[snapshot]) / params->EscapeFracRedshiftOffset, params->EscapeFracRedshiftScaling);
 
   // galaxy properties
   switch (params->EscapeFracDependency) {
@@ -165,7 +165,6 @@ void call_find_HII_bubbles(int snapshot, int nout_gals, timer_info* timer)
 {
   // Thin wrapper round find_HII_bubbles
 
-  int snapshots[12] = {48, 58, 75, 82, 86, 90, 94, 98, 103, 108, 113, 119};
 
   int total_n_out_gals = 0;
 
@@ -192,12 +191,8 @@ void call_find_HII_bubbles(int snapshot, int nout_gals, timer_info* timer)
     // save the grids prior to doing FFTs to avoid precision loss and aliasing etc.
     for (int i_out = 0; i_out < run_globals.NOutputSnaps; i_out++){
       if (snapshot == run_globals.ListOutputSnaps[i_out] && run_globals.params.Flag_OutputGrids)
-		for (int ii = 0; ii < 12; ii++){
-			if (i_out == snapshots[ii]){
 		        save_reion_input_grids(snapshot);
 			}
-		}
-	}
   }
 
   mlog("...done", MLOG_CLOSE);
