@@ -116,13 +116,18 @@ void init_templates_mini(mag_params_t* miniSpectra,
   FILE *ptr;
   double hst_lambda[9001];
   double hst_transmission[2][9001];
-  ptr = fopen("/home/yqin/bitbucket/meraxes/src/core/HST_IR_wavelength.bin", "rb");
+  char fname[STRLEN];
+
+  sprintf(fname, "%s/HST_IR_wavelength.bin", run_globals.params.PhotometricTablesDir);
+  ptr = fopen(fname, "rb");
   fread(hst_lambda, sizeof(hst_lambda), 1, ptr);
   fclose(ptr);
-  ptr = fopen("/home/yqin/bitbucket/meraxes/src/core/HST_IR_F160W_transmission.bin", "rb");
+  sprintf(fname, "%s/HST_IR_F160W_transmission.bin", run_globals.params.PhotometricTablesDir);
+  ptr = fopen(fname, "rb");
   fread(hst_transmission[0], sizeof(hst_transmission[0]), 1, ptr);
   fclose(ptr);
-  ptr = fopen("/home/yqin/bitbucket/meraxes/src/core/HST_IR_F125W_transmission.bin", "rb");
+  sprintf(fname, "%s/HST_IR_F125W_transmission.bin", run_globals.params.PhotometricTablesDir);
+  ptr = fopen(fname, "rb");
   fread(hst_transmission[1], sizeof(hst_transmission[1]), 1, ptr);
   fclose(ptr);
 
@@ -150,7 +155,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
     hst_number[1] = spectra[iS].nWaves;
     hst_transmission_splined = (double*)malloc((hst_number[0]+hst_number[1])*sizeof(double));
     hst_lambda_splined = (double*)malloc((hst_number[0]+hst_number[1])*sizeof(double));
-    mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[nAgeStep]);
+    //mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[nAgeStep]);
     
     for (iwave=0; iwave<hst_number[0]; iwave++){
         if (iwave==0)
@@ -163,8 +168,8 @@ void init_templates_mini(mag_params_t* miniSpectra,
             hst_transmission_splined[iwave] = 0;
         else{
             hst_transmission_splined[iwave] = gsl_spline_eval(spline[0], hst_lambda_splined[iwave], acc[0]);
-	        mlog("iwave = %d: spectra.waves=%.1f, hst_lambda_splined=%.1f, hst_transmission_splined=%.6f",MLOG_MESG, iwave, spectra[iS].waves[iwave], hst_lambda_splined[iwave], hst_transmission_splined[iwave]);
-		}
+     //       mlog("iwave = %d: spectra.waves=%.1f, hst_lambda_splined=%.1f, hst_transmission_splined=%.6f",MLOG_MESG, iwave, spectra[iS].waves[iwave], hst_lambda_splined[iwave], hst_transmission_splined[iwave]);
+        }
     }
     for (iwave=0; iwave<hst_number[1]; iwave++){
         if (iwave==0)
@@ -177,14 +182,16 @@ void init_templates_mini(mag_params_t* miniSpectra,
             hst_transmission_splined[iwave+hst_number[0]] = 0;
         else{
             hst_transmission_splined[iwave+hst_number[0]] = gsl_spline_eval(spline[1], hst_lambda_splined[iwave+hst_number[0]], acc[1]);
-        	mlog("iwave = %d: spectra.waves=%.1f, hst_lambda_splined=%.1f, hst_transmission_splined=%.6f",MLOG_MESG, iwave, spectra[iS].waves[iwave], hst_lambda_splined[iwave+hst_number[0]], hst_transmission_splined[iwave+hst_number[0]]);
-		}
+     //       mlog("iwave = %d: spectra.waves=%.1f, hst_lambda_splined=%.1f, hst_transmission_splined=%.6f",MLOG_MESG, iwave, spectra[iS].waves[iwave], hst_lambda_splined[iwave+hst_number[0]], hst_transmission_splined[iwave+hst_number[0]]);
+        }
     }
 
     // Initialise filters
     init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, hst_transmission_splined, hst_lambda_splined, hst_number, 2, redshifts[nAgeStep]);
-	for (iwave=0; iwave<3; iwave++)
-        mlog("iwave = %d: spectra.centreWave=%.1f",MLOG_MESG, iwave, spectra[iS].centreWaves[iwave]);
+    for (iwave=0; iwave<3; iwave++){
+      //  mlog("iwave = %d: spectra.centreWave=%.1f",MLOG_MESG, iwave, spectra[iS].centreWaves[iwave]);
+        miniSpectra->allcentreWaves[iS][iwave] = spectra[iS].centreWaves[iwave];
+    }
 
     if (spectra[iS].nFlux != MAGS_N_BANDS) {
       mlog_error("MAGS_N_BANDS does not match!\n");
@@ -399,8 +406,8 @@ void init_magnitudes(void)
     mlog("#***********************************************************", MLOG_MESG);
 
     // Initialise SED templates
-    char* fname = params->PhotometricTablesDir;
-    strcat(fname, "/sed_library.hdf5");
+    char fname[STRLEN];
+    sprintf(fname, "%s/sed_library.hdf5", run_globals.params.PhotometricTablesDir);
     // Convert time unit to yr
     int snaplist_len = params->SnaplistLength;
     double* LTTime = malloc(snaplist_len * sizeof(double));
@@ -510,7 +517,7 @@ void get_output_magnitudes(float* mags, float* dusty_mags, galaxy_t* gal, int sn
     memcpy(local_OutBCFlux, pOutBCFlux, sizeof(local_OutBCFlux));
 
     dust_absorption_approx(
-      local_InBCFlux, local_OutBCFlux, run_globals.mag_params.centreWaves, MAGS_N_BANDS, &dust_params);
+      local_InBCFlux, local_OutBCFlux, run_globals.mag_params.allcentreWaves[iS], MAGS_N_BANDS, &dust_params);
 
     for (int i_band = 0; i_band < MAGS_N_BANDS; ++i_band) {
       dusty_mags[i_band] = (float)(-2.5 * log10(local_InBCFlux[i_band] + local_OutBCFlux[i_band]) + 8.9 + sfr_unit);
