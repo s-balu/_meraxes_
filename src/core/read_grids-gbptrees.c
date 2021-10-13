@@ -139,7 +139,7 @@ int read_grid__gbptrees(const enum grid_prop property, const int snapshot, float
   MPI_Bcast(&start_foffset, 1, MPI_LONG, 0, run_globals.mpi_comm);
 
   // Check if the grid in the file is higher resolution than we require
-  double resample_factor = calc_resample_factor(n_cell);
+  double resample_factor = calc_resample_factor(n_cell[0]);
 
 #ifdef DEBUG
   mlog("Resample factor = %.3g", MLOG_MESG, resample_factor);

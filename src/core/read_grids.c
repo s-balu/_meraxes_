@@ -23,21 +23,21 @@ void read_grid(const enum grid_prop property, const int snapshot, float* slab)
   }
 }
 
-double calc_resample_factor(int n_cell[3])
+double calc_resample_factor(int n_cell)
 {
   int ReionGridDim = run_globals.params.ReionGridDim;
 
   // Check that n_cell is divisible by ReionGridDim. We need this to ensure
   // that grid points are evenly spaced in the volume after resampling.
-  if (n_cell[0] % ReionGridDim != 0) {
+  if (n_cell % ReionGridDim != 0) {
     mlog_error(
-      "n_cell (%d) is not divisble by ReionGridDim (%d). This is required for downsampling.", n_cell[0], ReionGridDim);
+      "n_cell (%d) is not divisble by ReionGridDim (%d). This is required for downsampling.", n_cell, ReionGridDim);
     ABORT(EXIT_FAILURE);
   }
 
   // Check if the grid in the file is higher resolution than we require
-  if (n_cell[0] != ReionGridDim) {
-    double resample_factor = (double)ReionGridDim / (double)n_cell[0];
+  if (n_cell != ReionGridDim) {
+    double resample_factor = (double)ReionGridDim / (double)n_cell;
     if (resample_factor > 1.0001) {
       mlog_error("Grid has a resolution less than that required! Aborting!");
       ABORT(EXIT_FAILURE);
