@@ -192,12 +192,12 @@ void call_find_HII_bubbles(int snapshot, int nout_gals, timer_info* timer)
     // save the grids prior to doing FFTs to avoid precision loss and aliasing etc.
     for (int i_out = 0; i_out < run_globals.NOutputSnaps; i_out++){
       if (snapshot == run_globals.ListOutputSnaps[i_out] && run_globals.params.Flag_OutputGrids)
-		for (int ii = 0; ii < 12; ii++){
-			if (i_out == snapshots[ii]){
-		        save_reion_input_grids(snapshot);
-			}
-		}
-	}
+        for (int ii = 0; ii < 12; ii++){
+            if (i_out == snapshots[ii]){
+                save_reion_input_grids(snapshot);
+            }
+        }
+    }
   }
 
   mlog("...done", MLOG_CLOSE);
@@ -959,6 +959,7 @@ void construct_baryon_grids(int snapshot, int local_ngals)
   float* sfr_grid = run_globals.reion_grids.sfr;
   int ReionGridDim = run_globals.params.ReionGridDim;
   double sfr_timescale = run_globals.params.ReionSfrTimescale * hubble_time(snapshot);
+  double global_sfr, global_star;
 
   gal_to_slab_t* galaxy_to_slab_map = run_globals.reion_grids.galaxy_to_slab_map;
   ptrdiff_t* slab_ix_start = run_globals.reion_grids.slab_ix_start;
@@ -1072,16 +1073,20 @@ void construct_baryon_grids(int snapshot, int local_ngals)
         // finally copying the values into the appropriate slab.
         switch (prop) {
           case prop_sfr:
+            global_sfr = 0.0;
             for (int ix = 0; ix < slab_nix[i_r]; ix++)
               for (int iy = 0; iy < ReionGridDim; iy++)
                 for (int iz = 0; iz < ReionGridDim; iz++) {
                   double val = (double)buffer[grid_index(ix, iy, iz, ReionGridDim, INDEX_REAL)];
                   val = (val > 0) ? val / sfr_timescale : 0;
                   sfr_grid[grid_index(ix, iy, iz, ReionGridDim, INDEX_PADDED)] = (float)val;
+                  global_sfr += val;
                 }
+            mlog("[i_r=%d] volume_weighted_global_sfr = %g", MLOG_MESG, global_sfr);
             break;
 
           case prop_stellar:
+            global_star = 0.0;
             for (int ix = 0; ix < slab_nix[i_r]; ix++)
               for (int iy = 0; iy < ReionGridDim; iy++)
                 for (int iz = 0; iz < ReionGridDim; iz++) {
@@ -1089,7 +1094,9 @@ void construct_baryon_grids(int snapshot, int local_ngals)
                   if (val < 0)
                     val = 0;
                   stellar_grid[grid_index(ix, iy, iz, ReionGridDim, INDEX_PADDED)] = val;
+                  global_star += val;
                 }
+            mlog("[i_r=%d] volume_weighted_global_stars = %g", MLOG_MESG, global_star);
             break;
 
           default:
