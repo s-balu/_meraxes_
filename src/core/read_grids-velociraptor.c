@@ -104,7 +104,7 @@ static int read_swift(const enum grid_prop property, const int snapshot, float* 
   mlog("grid_dim = %d", MLOG_MESG, grid_dim);
   mlog("box_size = %.2f cMpc/h", MLOG_MESG, box_size[1] * params->Hubble_h);
 
-  double resample_factor = calc_resample_factor((int[3]){ grid_dim, grid_dim, grid_dim });
+  double resample_factor = calc_resample_factor(grid_dim);
 
 #ifdef DEBUG
   mlog("Resample factor = %.3g", MLOG_MESG, resample_factor);
@@ -329,7 +329,7 @@ static int read_vr_multi(const enum grid_prop property, const int snapshot, floa
   mlog("n_cell = [%d, %d, %d]", MLOG_MESG, file_n_cell[0], file_n_cell[1], file_n_cell[2]);
   mlog("box_size = %.2f cMpc/h", MLOG_MESG, box_size * params->Hubble_h);
 
-  double resample_factor = calc_resample_factor(file_n_cell);
+  double resample_factor = calc_resample_factor(file_n_cell[0]);
 
   int mpi_size = run_globals.mpi_size;
   int mpi_rank = run_globals.mpi_rank;

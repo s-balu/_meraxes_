@@ -16,7 +16,7 @@ enum grid_prop
 extern "C" {
 #endif
 
-double calc_resample_factor(int n_cell[3]);
+double calc_resample_factor(int n_cell);
 void smooth_grid(double resample_factor,
                  int n_cell[3],
                  fftwf_complex* slab,
