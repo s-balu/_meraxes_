@@ -1,3 +1,6 @@
+.vscode/
+Doxyfile
+Doxygen_output/
 Log_files
 src/3rd_party
 find_HII_bubbles
