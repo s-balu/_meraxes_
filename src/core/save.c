@@ -101,7 +101,7 @@ void calc_hdf5_props()
     int i, i_snip; // dummy
 
     h5props->n_props = 27;
-    h5props_snip->n_props = 4;
+    h5props_snip->n_props = 1;
 
 #ifdef CALC_MAGS
     h5props->n_props += 2;
@@ -157,13 +157,6 @@ void calc_hdf5_props()
     h5props->field_h_conv[i] = "None";
     h5props->field_types[i++] = H5T_NATIVE_LLONG;
 
-    h5props_snip->dst_offsets[i_snip] = HOFFSET(galaxy_output_t, Type);
-    h5props_snip->dst_field_sizes[i_snip] = sizeof(galout.Type);
-    h5props_snip->field_names[i_snip] = "Type";
-    h5props_snip->field_units[i_snip] = "None";
-    h5props_snip->field_h_conv[i_snip] = "None";
-    h5props_snip->field_types[i_snip++] = H5T_NATIVE_INT;
-
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Type);
     h5props->dst_field_sizes[i] = sizeof(galout.Type);
     h5props->field_names[i] = "Type";
@@ -184,13 +177,6 @@ void calc_hdf5_props()
     h5props->field_units[i] = "None";
     h5props->field_h_conv[i] = "None";
     h5props->field_types[i++] = H5T_NATIVE_INT;
-
-    h5props_snip->dst_offsets[i_snip] = HOFFSET(galaxy_output_t, GhostFlag);
-    h5props_snip->dst_field_sizes[i_snip] = sizeof(galout.GhostFlag);
-    h5props_snip->field_names[i_snip] = "GhostFlag";
-    h5props_snip->field_units[i_snip] = "None";
-    h5props_snip->field_h_conv[i_snip] = "None";
-    h5props_snip->field_types[i_snip++] = H5T_NATIVE_INT;
 
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Len);
     h5props->dst_field_sizes[i] = sizeof(galout.Len);
@@ -226,13 +212,6 @@ void calc_hdf5_props()
     h5props->field_units[i] = "1e10 solMass";
     h5props->field_h_conv[i] = "v/h";
     h5props->field_types[i++] = H5T_NATIVE_FLOAT;
-
-    h5props_snip->dst_offsets[i_snip] = HOFFSET(galaxy_output_t, Mvir);
-    h5props_snip->dst_field_sizes[i_snip] = sizeof(galout.Mvir);
-    h5props_snip->field_names[i_snip] = "Mvir";
-    h5props_snip->field_units[i_snip] = "1e10 solMass";
-    h5props_snip->field_h_conv[i_snip] = "v/h";
-    h5props_snip->field_types[i_snip++] = H5T_NATIVE_FLOAT;
 
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Rvir);
     h5props->dst_field_sizes[i] = sizeof(galout.Rvir);
