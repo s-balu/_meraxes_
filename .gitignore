@@ -1,3 +1,6 @@
+.vscode/
+Doxyfile
+Doxygen_output/
 .idea
 justfile
 src/.cache
