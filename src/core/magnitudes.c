@@ -7,10 +7,6 @@
 #include "misc_tools.h"
 #include "parse_paramfile.h"
 
-#include <gsl/gsl_interp.h>
-#include <gsl/gsl_spline.h>
-
-
 void init_luminosities(galaxy_t* gal)
 {
   // Initialise all elements of flux arrays to TOL.
@@ -113,79 +109,13 @@ void init_templates_mini(mag_params_t* miniSpectra,
   struct sed_params_t spectra[MAGS_N_SNAPS];
   int nAgeStep;
   double* ageStep;
-  FILE *ptr;
-  double hst_lambda[9001];
-  double hst_transmission[2][9001];
-  ptr = fopen("/home/yqin/bitbucket/meraxes/src/core/HST_IR_wavelength.bin", "rb");
-  fread(hst_lambda, sizeof(hst_lambda), 1, ptr);
-  fclose(ptr);
-  ptr = fopen("/home/yqin/bitbucket/meraxes/src/core/HST_IR_F160W_transmission.bin", "rb");
-  fread(hst_transmission[0], sizeof(hst_transmission[0]), 1, ptr);
-  fclose(ptr);
-  ptr = fopen("/home/yqin/bitbucket/meraxes/src/core/HST_IR_F125W_transmission.bin", "rb");
-  fread(hst_transmission[1], sizeof(hst_transmission[1]), 1, ptr);
-  fclose(ptr);
 
-  static gsl_interp_accel* acc[2];
-  static gsl_spline* spline[2];
-  acc[0] = gsl_interp_accel_alloc();
-  spline[0] = gsl_spline_alloc(gsl_interp_linear, 9001);
-  acc[1] = gsl_interp_accel_alloc();
-  spline[1] = gsl_spline_alloc(gsl_interp_linear, 9001);
-  gsl_spline_init(spline[0], hst_lambda, hst_transmission[0], 9001);
-  gsl_spline_init(spline[1], hst_lambda, hst_transmission[1], 9001);
-  int iwave;
-  double *hst_transmission_splined, *hst_lambda_splined;
-  int *hst_number;
-  hst_number = (int *)calloc(2, sizeof(int));
-
-//  for (iwave=0; iwave<9000; iwave++)
-//      mlog("wave=%.1f; transmission=%.6f(%.6f), wave=%.1f; transmission=%.6f(%.6f)", MLOG_MESG,hst_lambda[iwave], hst_transmission[0][iwave], gsl_spline_eval(spline[0], hst_lambda[iwave]+0.5, acc[0]), hst_lambda[iwave], hst_transmission[1][iwave], gsl_spline_eval(spline[1], hst_lambda[iwave]+0.5, acc[1]));
   for (iS = 0; iS < MAGS_N_SNAPS; ++iS) {
     nAgeStep = targetSnap[iS];
     // Initialise raw templates
     init_templates_raw(spectra + iS, fName);
-
-    hst_number[0] = spectra[iS].nWaves;
-    hst_number[1] = spectra[iS].nWaves;
-    hst_transmission_splined = (double*)malloc((hst_number[0]+hst_number[1])*sizeof(double));
-    hst_lambda_splined = (double*)malloc((hst_number[0]+hst_number[1])*sizeof(double));
-    mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[nAgeStep]);
-    
-    for (iwave=0; iwave<hst_number[0]; iwave++){
-        if (iwave==0)
-            hst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] +1e-4);
-        else if (iwave==hst_number[0]-1)
-            hst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] -1e-4);
-        else
-            hst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]);
-        if (hst_lambda_splined[iwave] < hst_lambda[0] || hst_lambda_splined[iwave]>hst_lambda[9000])
-            hst_transmission_splined[iwave] = 0;
-        else{
-            hst_transmission_splined[iwave] = gsl_spline_eval(spline[0], hst_lambda_splined[iwave], acc[0]);
-	        mlog("iwave = %d: spectra.waves=%.1f, hst_lambda_splined=%.1f, hst_transmission_splined=%.6f",MLOG_MESG, iwave, spectra[iS].waves[iwave], hst_lambda_splined[iwave], hst_transmission_splined[iwave]);
-		}
-    }
-    for (iwave=0; iwave<hst_number[1]; iwave++){
-        if (iwave==0)
-            hst_lambda_splined[iwave+hst_number[0]] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]+1e-4);
-        else if (iwave==hst_number[1]-1)
-            hst_lambda_splined[iwave+hst_number[0]] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]-1e-4);
-        else
-            hst_lambda_splined[iwave+hst_number[0]] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]);
-        if (hst_lambda_splined[iwave+hst_number[0]] < hst_lambda[0] || hst_lambda_splined[iwave+hst_number[0]]>hst_lambda[9000])
-            hst_transmission_splined[iwave+hst_number[0]] = 0;
-        else{
-            hst_transmission_splined[iwave+hst_number[0]] = gsl_spline_eval(spline[1], hst_lambda_splined[iwave+hst_number[0]], acc[1]);
-        	mlog("iwave = %d: spectra.waves=%.1f, hst_lambda_splined=%.1f, hst_transmission_splined=%.6f",MLOG_MESG, iwave, spectra[iS].waves[iwave], hst_lambda_splined[iwave+hst_number[0]], hst_transmission_splined[iwave+hst_number[0]]);
-		}
-    }
-
     // Initialise filters
-    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, hst_transmission_splined, hst_lambda_splined, hst_number, 2, redshifts[nAgeStep]);
-	for (iwave=0; iwave<3; iwave++)
-        mlog("iwave = %d: spectra.centreWave=%.1f",MLOG_MESG, iwave, spectra[iS].centreWaves[iwave]);
-
+    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, NULL, NULL, NULL, 0, 1. + redshifts[iS]);
     if (spectra[iS].nFlux != MAGS_N_BANDS) {
       mlog_error("MAGS_N_BANDS does not match!\n");
       exit(EXIT_FAILURE);
@@ -209,15 +139,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
     init_templates_working(spectra + iS, NULL, NULL, -1);
     // Initialise special templates for birth cloud
     init_templates_special(spectra + iS, tBC, 1);
-    free(hst_transmission_splined);
-    free(hst_lambda_splined);
   }
-  free(hst_number);
-  gsl_spline_free(spline[0]);
-  gsl_spline_free(spline[1]);
-  gsl_interp_accel_free(acc[0]);
-  gsl_interp_accel_free(acc[1]);
-
 
   // Initialise mini templates
   int nSize = 0;
@@ -392,7 +314,7 @@ void init_magnitudes(void)
     for (int i_band = 0; i_band < n_rest; ++i_band)
       mlog("#\t%.1f AA to %.1f", MLOG_MESG, rest_bands[2 * i_band], rest_bands[2 * i_band + 1]);
     //
-    if (n_beta + n_rest + 2!= MAGS_N_BANDS) {
+    if (n_beta + n_rest != MAGS_N_BANDS) {
       mlog_error("Number of beta and rest-frame filters do not match MAGS_N_BANDS!", MLOG_MESG);
       ABORT(EXIT_FAILURE);
     }
@@ -476,7 +398,6 @@ void get_output_magnitudes(float* mags, float* dusty_mags, galaxy_t* gal, int sn
   int* targetSnap = run_globals.mag_params.targetSnap;
   double* pInBCFlux = gal->inBCFlux;
   double* pOutBCFlux = gal->outBCFlux;
-  double sqrt_2 = 1.414213562;
 
   for (iS = 0; iS < MAGS_N_SNAPS; ++iS) {
     if (snapshot == targetSnap[iS])
@@ -497,8 +418,7 @@ void get_output_magnitudes(float* mags, float* dusty_mags, galaxy_t* gal, int sn
 
     // Best fit dust--gas model from Qiu, Mutch, da Cunha et al. 2019, MNRAS, 489, 1357
     double factor = pow(calc_metallicity(gal->ColdGas, gal->MetalsColdGas) / 0.02, 0.65) * gal->ColdGas *
-                    pow(gal->Spin * gal->Rvir / sqrt_2 * 1e3, -2.0) * exp(-0.35 * redshift);
-    // pow(gal->DiskScaleLength * 1e3, -2.0) * exp(-0.35 * redshift);
+                    pow(gal->DiskScaleLength * 1e3, -2.0) * exp(-0.34 * redshift);
     dust_params_t dust_params = { .tauUV_ISM = 13.5 * factor,
                                   .nISM = -1.6,
                                   .tauUV_BC = 381.3 * factor,
