@@ -258,11 +258,12 @@ void calc_hdf5_props()
     h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
 
-        h5props->dst_field_sizes[i] = sizeof(galout.Mcool);
-        h5props->field_names[i] = "Mcool";
-        h5props->field_units[i] = "1e10 solMass";
-        h5props->field_h_conv[i] = "v/h";
-        h5props->field_types[i++] = H5T_NATIVE_FLOAT;
+    // h5props->dst_field_sizes[i] = sizeof(galout.Mcool);
+    // h5props->field_names[i] = "Mcool";
+    // h5props->field_units[i] = "1e10 solMass";
+    // h5props->field_h_conv[i] = "v/h";
+    // h5props->field_types[i++] = H5T_NATIVE_FLOAT;
+
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, StellarMass);
     h5props->dst_field_sizes[i] = sizeof(galout.StellarMass);
     h5props->field_names[i] = "StellarMass";
