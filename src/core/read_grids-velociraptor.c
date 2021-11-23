@@ -117,7 +117,7 @@ static int read_swift(const enum grid_prop property, const int snapshot, float* 
   ptrdiff_t slab_n_complex_file = fftwf_mpi_local_size_3d(
     grid_dim, grid_dim, grid_dim / 2 + 1, run_globals.mpi_comm, &slab_nix_file, &slab_ix_start_file);
   fftwf_complex* slab_file = fftwf_alloc_complex((size_t)slab_n_complex_file);
-
+  assert(slab_file != NULL);
   // Initialise (just in case!)
   for (int ii = 0; ii < slab_n_complex_file; ii++)
     slab_file[ii] = 0 + 0I;
