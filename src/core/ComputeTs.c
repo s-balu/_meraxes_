@@ -142,10 +142,6 @@ void _ComputeTs(int snapshot)
           i_padded = grid_index(ix, iy, iz, ReionGridDim, INDEX_PADDED);
 
           density_over_mean = 1.0 + run_globals.reion_grids.deltax[i_padded];
-		
-	  if (density_over_mean < REL_TOL) {
-        	density_over_mean = REL_TOL;
-          	}
 
           // Multiplied by h^2 as RtoM(R) uses RhoCrit which doesn't include h factors
           collapse_fraction +=
@@ -207,10 +203,6 @@ void _ComputeTs(int snapshot)
               }
 
               density_over_mean = 1.0 + run_globals.reion_grids.deltax[i_padded];
-          
-	      if (density_over_mean < REL_TOL) {
-             	density_over_mean = REL_TOL;
-         	 }
               
 	      collapse_fraction +=
                 run_globals.reion_grids.stars[i_padded] /
