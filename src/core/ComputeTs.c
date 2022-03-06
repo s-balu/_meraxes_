@@ -43,7 +43,7 @@ void _ComputeTs(int snapshot)
 
   double prev_zpp, prev_R, zpp, zp, lower_int_limit_GAL, lower_int_limit_QSO, filling_factor_of_HI_zp, R_factor, R,
     nuprime, dzp, Luminosity_converstion_factor_GAL, Luminosity_converstion_factor_QSO;
-  double collapse_fraction, density_over_mean;
+  double collapse_fraction, density_over_mean, collapse_fraction_in_cell;
 
   // TODO: Can we reduce the scope of these variables and, if not, improve the names?
   double weight = 0;
@@ -142,16 +142,17 @@ void _ComputeTs(int snapshot)
           i_padded = grid_index(ix, iy, iz, ReionGridDim, INDEX_PADDED);
 
           density_over_mean = 1.0 + run_globals.reion_grids.deltax[i_padded];
-          
-          if(density_over_mean < REL_TOL) {
-            density_over_mean = REL_TOL;
-          }
-          
+
           // Multiplied by h^2 as RtoM(R) uses RhoCrit which doesn't include h factors
-          collapse_fraction +=
+          collapse_fraction_in_cell =
             run_globals.reion_grids.stars[i_padded] /
             (RtoM(R) * run_globals.params.Hubble_h * run_globals.params.Hubble_h * density_over_mean) * (4.0 / 3.0) *
             M_PI * pow(R, 3.0) / pixel_volume;
+          
+          if (collapse_fraction_in_cell > 1.0){
+            collapse_fraction_in_cell = 1.0;
+          }
+          collapse_fraction += collapse_fraction_in_cell;
         }
 
     MPI_Allreduce(MPI_IN_PLACE, &collapse_fraction, 1, MPI_DOUBLE, MPI_SUM, run_globals.mpi_comm);
@@ -207,16 +208,16 @@ void _ComputeTs(int snapshot)
               }
 
               density_over_mean = 1.0 + run_globals.reion_grids.deltax[i_padded];
-          
-              if(density_over_mean < REL_TOL) {
-                density_over_mean = REL_TOL;
-              }
-          
-              collapse_fraction +=
+              
+	            collapse_fraction_in_cell =
                 run_globals.reion_grids.stars[i_padded] /
                 (RtoM(R) * run_globals.params.Hubble_h * run_globals.params.Hubble_h * density_over_mean) *
                 (4.0 / 3.0) * M_PI * pow(R, 3.0) / pixel_volume;
-
+              
+              if (collapse_fraction_in_cell > 1.0){
+                collapse_fraction_in_cell = 1.0;
+              }
+              collapse_fraction += collapse_fraction_in_cell;
               x_e_ave += x_e_box_prev[i_padded];
             }
 
