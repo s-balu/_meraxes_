@@ -140,8 +140,9 @@ void ComputeBrightnessTemperatureBox(int snapshot)
     vel = run_globals.reion_grids.vel;
 
     // Temporary fix to the potential units issue with the velocity field
-    // Multiply by 1/a to convert SWIFT internal units to proper velocities.
-    // The  velocities need to be in physical km/s units.
+    // Multiply by sqrt(a) to convert Gadget internal units to proper velocities.
+    // Dividing by 1000. because I believe the units are actually m/s not km/s (too large otherwise)
+    // I am just going to divide by 1000. until I recieve confirmation
     for (ii = 0; ii < local_nix; ii++) {
       for (jj = 0; jj < ReionGridDim; jj++) {
         for (kk = 0; kk < ReionGridDim; kk++) {
@@ -149,7 +150,6 @@ void ComputeBrightnessTemperatureBox(int snapshot)
 
           vel[i_padded] = (float)((1. + redshift) * vel[i_padded]);
 
-          // Here I believe we have converted into Mpc/s which is a weird unit.
           vel[i_padded] *= 1000. * 100. / MPC;
 
           // The algorithm used in 21cmFAST for dealing with velocities uses the **comoving** velocity. Therefore,
