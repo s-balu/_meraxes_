@@ -148,7 +148,7 @@ void ComputeBrightnessTemperatureBox(int snapshot)
         for (kk = 0; kk < ReionGridDim; kk++) {
           i_padded = grid_index(ii, jj, kk, ReionGridDim, INDEX_PADDED);
 
-          vel[i_padded] = (float)(sqrt(1. / (1. + redshift)) * vel[i_padded] / 1000.);
+          vel[i_padded] = (float)((1. + redshift) * vel[i_padded]);
 
           vel[i_padded] *= 1000. * 100. / MPC;
 
