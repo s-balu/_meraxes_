@@ -148,11 +148,11 @@ void init_templates_mini(mag_params_t* miniSpectra,
   jwst_number = (int *)calloc(N_JWST, sizeof(int));
   int iwave_offset, n_splined;
 
-  for (iband=0; iband<N_JWST; iband++){
+/*  for (iband=0; iband<N_JWST; iband++){
       for (iwave=0; iwave<jwst_length[iband]; iwave++)
           mlog("iband=%d; wave=%.6f; transmission=%.6f", MLOG_MESG,iband,jwst_lambda[iband][iwave], jwst_transmission[iband][iwave]); 
   }
-
+*/
   for (iS = 0; iS < MAGS_N_SNAPS; ++iS) {
     nAgeStep = targetSnap[iS];
     // Initialise raw templates
@@ -166,7 +166,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
 
     jwst_transmission_splined = (double*)malloc(n_splined*sizeof(double));
     jwst_lambda_splined = (double*)malloc(n_splined*sizeof(double));
-    mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[nAgeStep]);
+    //mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[nAgeStep]);
     
 
     iwave_offset = 0;
@@ -182,7 +182,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
                 jwst_transmission_splined[iwave+iwave_offset] = 0;
             else{
                 jwst_transmission_splined[iwave+iwave_offset] = gsl_spline_eval(spline[iband], jwst_lambda_splined[iwave+iwave_offset], acc[iband]);
-                mlog("iband=%d; iwave = %d: spectra.waves=%.1f, jwst_lambda_splined=%.1f, jwst_transmission_splined=%.6f",MLOG_MESG,iband, iwave, spectra[iS].waves[iwave+iwave_offset], jwst_lambda_splined[iwave+iwave_offset], jwst_transmission_splined[iwave+iwave_offset]);
+                //mlog("iband=%d; iwave = %d: spectra.waves=%.1f, jwst_lambda_splined=%.1f, jwst_transmission_splined=%.6f",MLOG_MESG,iband, iwave, spectra[iS].waves[iwave+iwave_offset], jwst_lambda_splined[iwave+iwave_offset], jwst_transmission_splined[iwave+iwave_offset]);
             }
         }
         iwave_offset += jwst_number[iband];
