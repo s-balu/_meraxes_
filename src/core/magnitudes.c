@@ -146,21 +146,27 @@ void init_templates_mini(mag_params_t* miniSpectra,
   double *jwst_transmission_splined, *jwst_lambda_splined;
   int *jwst_number;
   jwst_number = (int *)calloc(N_JWST, sizeof(int));
-  int iwave_offset;
+  int iwave_offset, n_splined;
 
-//  for (iwave=0; iwave<9000; iwave++)
-//      mlog("wave=%.1f; transmission=%.6f(%.6f), wave=%.1f; transmission=%.6f(%.6f)", MLOG_MESG,jwst_lambda[iwave], jwst_transmission[0][iwave], gsl_spline_eval(spline[0], jwst_lambda[iwave]+0.5, acc[0]), jwst_lambda[iwave], jwst_transmission[1][iwave], gsl_spline_eval(spline[1], jwst_lambda[iwave]+0.5, acc[1]));
+  for (iband=0; iband<N_JWST; iband++){
+      for (iwave=0; iwave<jwst_length[iband]; iwave++)
+          mlog("iband=%d; wave=%.6f; transmission=%.6f", MLOG_MESG,iband,jwst_lambda[iband][iwave], jwst_transmission[iband][iwave]); 
+  }
+
   for (iS = 0; iS < MAGS_N_SNAPS; ++iS) {
     nAgeStep = targetSnap[iS];
     // Initialise raw templates
     init_templates_raw(spectra + iS, fName);
 
-    for (iband=0; iband<N_JWST; iband++)
+    n_splined = 0;
+    for (iband=0; iband<N_JWST; iband++){
         jwst_number[iband] = spectra[iS].nWaves;
+        n_splined+=jwst_number[iband];
+    }
 
-    jwst_transmission_splined = (double*)malloc(N_JWST*sizeof(double));
-    jwst_lambda_splined = (double*)malloc(N_JWST*sizeof(double));
-    //mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[nAgeStep]);
+    jwst_transmission_splined = (double*)malloc(n_splined*sizeof(double));
+    jwst_lambda_splined = (double*)malloc(n_splined*sizeof(double));
+    mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[nAgeStep]);
     
 
     iwave_offset = 0;
@@ -176,7 +182,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
                 jwst_transmission_splined[iwave+iwave_offset] = 0;
             else{
                 jwst_transmission_splined[iwave+iwave_offset] = gsl_spline_eval(spline[iband], jwst_lambda_splined[iwave+iwave_offset], acc[iband]);
-         //       mlog("iwave = %d: spectra.waves=%.1f, jwst_lambda_splined=%.1f, jwst_transmission_splined=%.6f",MLOG_MESG, iwave, spectra[iS].waves[iwave], jwst_lambda_splined[iwave], jwst_transmission_splined[iwave]);
+                mlog("iband=%d; iwave = %d: spectra.waves=%.1f, jwst_lambda_splined=%.1f, jwst_transmission_splined=%.6f",MLOG_MESG,iband, iwave, spectra[iS].waves[iwave+iwave_offset], jwst_lambda_splined[iwave+iwave_offset], jwst_transmission_splined[iwave+iwave_offset]);
             }
         }
         iwave_offset += jwst_number[iband];
@@ -394,7 +400,7 @@ void init_magnitudes(void)
     for (int i_band = 0; i_band < n_rest; ++i_band)
       mlog("#\t%.1f AA to %.1f", MLOG_MESG, rest_bands[2 * i_band], rest_bands[2 * i_band + 1]);
     //
-    if (n_beta + n_rest + 2!= MAGS_N_BANDS) {
+    if (n_beta + n_rest + N_JWST!= MAGS_N_BANDS) {
       mlog_error("Number of beta and rest-frame filters do not match MAGS_N_BANDS!", MLOG_MESG);
       ABORT(EXIT_FAILURE);
     }
