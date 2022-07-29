@@ -190,7 +190,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
 
     // Initialise filters
     init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, jwst_transmission_splined, jwst_lambda_splined, jwst_number, N_JWST, redshifts[nAgeStep]);
-    for (iwave=0; iwave<3; iwave++){
+    for (iwave=0; iwave<MAGS_N_BANDS; iwave++){
       //  mlog("iwave = %d: spectra.centreWave=%.1f",MLOG_MESG, iwave, spectra[iS].centreWaves[iwave]);
         miniSpectra->allcentreWaves[iS][iwave] = spectra[iS].centreWaves[iwave];
     }
