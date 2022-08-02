@@ -191,27 +191,27 @@ void read_trees__velociraptor(int snapshot,
       // TODO(trees): Read tail.  If head<->tail then first progenitor line, else it's a merger.  We should populate the
       // new halo and then do a standard merger prescription.
 
-      READ_TREE_ENTRY_PROP(ForestID, unsigned long, H5T_NATIVE_LONG);
-      READ_TREE_ENTRY_PROP(Head, unsigned long, H5T_NATIVE_LONG);
+      READ_TREE_ENTRY_PROP(ForestID, unsigned long, H5T_NATIVE_ULONG);
+      READ_TREE_ENTRY_PROP(Head, unsigned long, H5T_NATIVE_ULONG);
       //READ_TREE_ENTRY_PROP(Tail, long, H5T_NATIVE_LONG);
-      READ_TREE_ENTRY_PROP(hostHaloID, int, H5T_NATIVE_LONG);
-      READ_TREE_ENTRY_PROP(Mass_200crit, float, H5T_NATIVE_DOUBLE);
-//      READ_TREE_ENTRY_PROP(Mass_FOF, double, H5T_NATIVE_DOUBLE);
-      READ_TREE_ENTRY_PROP(Mass_tot, float, H5T_NATIVE_DOUBLE);
-      READ_TREE_ENTRY_PROP(R_200crit, float, H5T_NATIVE_DOUBLE);
-      READ_TREE_ENTRY_PROP(Vmax, float, H5T_NATIVE_DOUBLE);
-      READ_TREE_ENTRY_PROP(Xc, float, H5T_NATIVE_DOUBLE);
-      READ_TREE_ENTRY_PROP(Yc, float, H5T_NATIVE_DOUBLE);
-      READ_TREE_ENTRY_PROP(Zc, float, H5T_NATIVE_DOUBLE);
-      READ_TREE_ENTRY_PROP(VXc, float, H5T_NATIVE_DOUBLE);
-      READ_TREE_ENTRY_PROP(VYc, float, H5T_NATIVE_DOUBLE);
-      READ_TREE_ENTRY_PROP(VZc, float, H5T_NATIVE_DOUBLE);
+      READ_TREE_ENTRY_PROP(hostHaloID, int, H5T_NATIVE_INT);
+      READ_TREE_ENTRY_PROP(Mass_200crit, float, H5T_NATIVE_FLOAT);
+//      READ_TREE_ENTRY_PROP(Mass_FOF, double, H5T_NATIVE_FLOAT);
+      READ_TREE_ENTRY_PROP(Mass_tot, float, H5T_NATIVE_FLOAT);
+      READ_TREE_ENTRY_PROP(R_200crit, float, H5T_NATIVE_FLOAT);
+      READ_TREE_ENTRY_PROP(Vmax, float, H5T_NATIVE_FLOAT);
+      READ_TREE_ENTRY_PROP(Xc, float, H5T_NATIVE_FLOAT);
+      READ_TREE_ENTRY_PROP(Yc, float, H5T_NATIVE_FLOAT);
+      READ_TREE_ENTRY_PROP(Zc, float, H5T_NATIVE_FLOAT);
+      READ_TREE_ENTRY_PROP(VXc, float, H5T_NATIVE_FLOAT);
+      READ_TREE_ENTRY_PROP(VYc, float, H5T_NATIVE_FLOAT);
+      READ_TREE_ENTRY_PROP(VZc, float, H5T_NATIVE_FLOAT);
 	  READ_TREE_ENTRY_PROP(AngMom, float, H5T_NATIVE_FLOAT);
-      //READ_TREE_ENTRY_PROP(Lx, float, H5T_NATIVE_DOUBLE);
-     // READ_TREE_ENTRY_PROP(Ly, float, H5T_NATIVE_DOUBLE);
-      //READ_TREE_ENTRY_PROP(Lz, float, H5T_NATIVE_DOUBLE);
-      READ_TREE_ENTRY_PROP(ID, unsigned int, H5T_NATIVE_ULONG);
-      READ_TREE_ENTRY_PROP(npart, unsigned int, H5T_NATIVE_ULONG);
+      //READ_TREE_ENTRY_PROP(Lx, float, H5T_NATIVE_FLOAT);
+     // READ_TREE_ENTRY_PROP(Ly, float, H5T_NATIVE_FLOAT);
+      //READ_TREE_ENTRY_PROP(Lz, float, H5T_NATIVE_FLOAT);
+      READ_TREE_ENTRY_PROP(ID, unsigned int, H5T_NATIVE_UINT);
+      READ_TREE_ENTRY_PROP(npart, unsigned int, H5T_NATIVE_UINT);
 
       H5Sclose(memspace_id);
       H5Sclose(fspace_id);
