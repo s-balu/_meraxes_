@@ -1326,9 +1326,9 @@ void save_reion_output_grids(int snapshot)
   //   write_grid_float("x_e_box", grid, file_id, fspace_id, memspace_id, dcpl_id);
   // }
 
-  // if (run_globals.params.Flag_Compute21cmBrightTemp) {
-  //   write_grid_float("delta_T", grids->delta_T, file_id, fspace_id, memspace_id, dcpl_id);
-  // }
+  if (run_globals.params.Flag_Compute21cmBrightTemp) {
+    write_grid_float("delta_T", grids->delta_T, file_id, fspace_id, memspace_id, dcpl_id);
+  }
 
   if (run_globals.params.Flag_ConstructLightcone && run_globals.params.EndSnapshotLightcone == snapshot &&
       snapshot != 0) {
@@ -1392,7 +1392,7 @@ void save_reion_output_grids(int snapshot)
   }
 
   if (run_globals.params.Flag_Compute21cmBrightTemp) {
-    H5LTset_attribute_double(file_id, "xH", "volume_ave_Tb", &(grids->volume_ave_Tb), 1);
+    H5LTset_attribute_double(file_id, "delta_T", "volume_ave_Tb", &(grids->volume_ave_Tb), 1);
   }
 
   // if (run_globals.params.Flag_ComputePS) {
