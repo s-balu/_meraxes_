@@ -74,8 +74,6 @@ void _ComputeTs(int snapshot)
   float* Tk_box = run_globals.reion_grids.Tk_box;
   float* TS_box = run_globals.reion_grids.TS_box;
 
-//  float* sfr = run_globals.reion_grids.sfr;
-
   fftwf_complex* sfr_unfiltered = run_globals.reion_grids.sfr_unfiltered;
   fftwf_complex* sfr_filtered = run_globals.reion_grids.sfr_filtered;
   fftwf_execute(run_globals.reion_grids.sfr_forward_plan);
@@ -218,7 +216,6 @@ void _ComputeTs(int snapshot)
                 collapse_fraction_in_cell = 1.0;
               }
               collapse_fraction += collapse_fraction_in_cell;
-              
               x_e_ave += x_e_box_prev[i_padded];
             }
 
