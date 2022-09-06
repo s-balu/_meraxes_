@@ -27,27 +27,27 @@ void prepare_galaxy_for_output(galaxy_t gal, galaxy_output_t* galout, int i_snap
 {
   run_units_t* units = &(run_globals.units);
 
-  galout->ID = gal.ID;
-  galout->Type = gal.Type;
-  if (!gal.ghost_flag) {
-    galout->HaloID = (long long)gal.Halo->ID;
-    galout->CentralGal = gal.Halo->FOFGroup->FirstOccupiedHalo->Galaxy->output_index;
-    galout->FOFMvir = (float)(gal.Halo->FOFGroup->Mvir);
-  } else {
-    galout->HaloID = -1;
-    galout->CentralGal = -1;
-    galout->FOFMvir = (float)-1.0;
-  }
-  galout->GhostFlag = (int)gal.ghost_flag;
+  // galout->ID = gal.ID;
+  // galout->Type = gal.Type;
+  // if (!gal.ghost_flag) {
+  //   galout->HaloID = (long long)gal.Halo->ID;
+  //   galout->CentralGal = gal.Halo->FOFGroup->FirstOccupiedHalo->Galaxy->output_index;
+  //   galout->FOFMvir = (float)(gal.Halo->FOFGroup->Mvir);
+  // } else {
+  //   galout->HaloID = -1;
+  //   galout->CentralGal = -1;
+  //   galout->FOFMvir = (float)-1.0;
+  // }
+  // galout->GhostFlag = (int)gal.ghost_flag;
 
-  for (int ii = 0; ii < 3; ii++) {
-    galout->Pos[ii] = gal.Pos[ii];
-    galout->Vel[ii] = gal.Vel[ii];
-  }
+  // for (int ii = 0; ii < 3; ii++) {
+  //   galout->Pos[ii] = gal.Pos[ii];
+  //   galout->Vel[ii] = gal.Vel[ii];
+  // }
 
   // galout->Len = gal.Len;
   // galout->MaxLen = gal.MaxLen;
-  galout->Mvir = (float)(gal.Mvir);
+  // galout->Mvir = (float)(gal.Mvir);
   // galout->Rvir = (float)(gal.Rvir);
   // galout->Vvir = (float)(gal.Vvir);
   // galout->Vmax = (float)(gal.Vmax);
@@ -61,7 +61,7 @@ void prepare_galaxy_for_output(galaxy_t gal, galaxy_output_t* galout, int i_snap
   // galout->HIMass = (float)(gal.HIMass);
   // galout->Mcool = (float)(gal.Mcool);
   galout->StellarMass = (float)(gal.StellarMass);
-  galout->GrossStellarMass = (float)(gal.GrossStellarMass);
+  // galout->GrossStellarMass = (float)(gal.GrossStellarMass);
   // galout->Fesc = (float)(gal.Fesc);
   // galout->FescWeightedGSM = (float)(gal.FescWeightedGSM);
   // galout->BlackHoleMass = (float)(gal.BlackHoleMass);
@@ -72,7 +72,7 @@ void prepare_galaxy_for_output(galaxy_t gal, galaxy_output_t* galout, int i_snap
   // galout->BlackHoleAccretedColdMass = (float)(gal.BlackHoleAccretedColdMass);
   // galout->DiskScaleLength = (float)(gal.DiskScaleLength);
   // galout->MetalsStellarMass = (float)(gal.MetalsStellarMass);
-  galout->Sfr = (float)(gal.Sfr * units->UnitMass_in_g / units->UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS);
+  // galout->Sfr = (float)(gal.Sfr * units->UnitMass_in_g / units->UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS);
   // galout->EjectedGas = (float)(gal.EjectedGas);
   // galout->MetalsEjectedGas = (float)(gal.MetalsEjectedGas);
   // galout->Rcool = (float)(gal.Rcool);
@@ -106,7 +106,7 @@ void calc_hdf5_props()
     galaxy_output_t galout;
     int i; // dummy
 
-    h5props->n_props = 6;
+    h5props->n_props = 1;
 
 #ifdef CALC_MAGS
     h5props->n_props += 2;
@@ -180,12 +180,12 @@ void calc_hdf5_props()
     // h5props->field_h_conv[i] = "None";
     // h5props->field_types[i++] = H5T_NATIVE_INT;
 
-    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Pos);
-    h5props->dst_field_sizes[i] = sizeof(galout.Pos);
-    h5props->field_names[i] = "Pos";
-    h5props->field_units[i] = "Mpc"; // comoving
-    h5props->field_h_conv[i] = "v/h";
-    h5props->field_types[i++] = h5props->array3f_tid;
+    // h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Pos);
+    // h5props->dst_field_sizes[i] = sizeof(galout.Pos);
+    // h5props->field_names[i] = "Pos";
+    // h5props->field_units[i] = "Mpc"; // comoving
+    // h5props->field_h_conv[i] = "v/h";
+    // h5props->field_types[i++] = h5props->array3f_tid;
 
     // h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Vel);
     // h5props->dst_field_sizes[i] = sizeof(galout.Vel);
@@ -201,12 +201,12 @@ void calc_hdf5_props()
     // h5props->field_h_conv[i] = "None";
     // h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
-    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Mvir);
-    h5props->dst_field_sizes[i] = sizeof(galout.Mvir);
-    h5props->field_names[i] = "Mvir";
-    h5props->field_units[i] = "1e10 solMass";
-    h5props->field_h_conv[i] = "v/h";
-    h5props->field_types[i++] = H5T_NATIVE_FLOAT;
+    // h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Mvir);
+    // h5props->dst_field_sizes[i] = sizeof(galout.Mvir);
+    // h5props->field_names[i] = "Mvir";
+    // h5props->field_units[i] = "1e10 solMass";
+    // h5props->field_h_conv[i] = "v/h";
+    // h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
     // h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Rvir);
     // h5props->dst_field_sizes[i] = sizeof(galout.Rvir);
@@ -229,12 +229,12 @@ void calc_hdf5_props()
     // h5props->field_h_conv[i] = "None";
     // h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
-    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, FOFMvir);
-    h5props->dst_field_sizes[i] = sizeof(galout.FOFMvir);
-    h5props->field_names[i] = "FOFMvir";
-    h5props->field_units[i] = "1e10 solMass";
-    h5props->field_h_conv[i] = "v/h";
-    h5props->field_types[i++] = H5T_NATIVE_FLOAT;
+    // h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, FOFMvir);
+    // h5props->dst_field_sizes[i] = sizeof(galout.FOFMvir);
+    // h5props->field_names[i] = "FOFMvir";
+    // h5props->field_units[i] = "1e10 solMass";
+    // h5props->field_h_conv[i] = "v/h";
+    // h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
     // h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, HotGas);
     // h5props->dst_field_sizes[i] = sizeof(galout.HotGas);
@@ -271,20 +271,20 @@ void calc_hdf5_props()
     h5props->field_h_conv[i] = "v/h";
     h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
-    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, GrossStellarMass);
-    h5props->dst_field_sizes[i] = sizeof(galout.GrossStellarMass);
-    h5props->field_names[i] = "GrossStellarMass";
-    h5props->field_units[i] = "1e10 solMass";
-    h5props->field_h_conv[i] = "v/h";
-    h5props->field_types[i++] = H5T_NATIVE_FLOAT;
+    // h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, GrossStellarMass);
+    // h5props->dst_field_sizes[i] = sizeof(galout.GrossStellarMass);
+    // h5props->field_names[i] = "GrossStellarMass";
+    // h5props->field_units[i] = "1e10 solMass";
+    // h5props->field_h_conv[i] = "v/h";
+    // h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
 
-    h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Sfr);
-    h5props->dst_field_sizes[i] = sizeof(galout.Sfr);
-    h5props->field_names[i] = "Sfr";
-    h5props->field_units[i] = "solMass/yr";
-    h5props->field_h_conv[i] = "None";
-    h5props->field_types[i++] = H5T_NATIVE_FLOAT;
+    // h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Sfr);
+    // h5props->dst_field_sizes[i] = sizeof(galout.Sfr);
+    // h5props->field_names[i] = "Sfr";
+    // h5props->field_units[i] = "solMass/yr";
+    // h5props->field_h_conv[i] = "None";
+    // h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
 #ifdef CALC_MAGS
     h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, Mags);
