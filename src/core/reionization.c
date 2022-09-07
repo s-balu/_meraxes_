@@ -14,6 +14,22 @@
 #include "reionization.h"
 #include "virial_properties.h"
 
+double arr_volume_weighted_global_xH[120];
+double arr_mass_weighted_global_xH[120];
+
+double arr_volume_ave_TS[120];
+double arr_volume_ave_TK[120];
+double arr_volume_ave_xe[120];
+
+double arr_volume_ave_J_alpha[120];
+double arr_volume_ave_xalpha[120];
+double arr_volume_ave_Xheat[120];
+double arr_volume_ave_Xion[120];
+
+double arr_volume_ave_Tb[120];
+
+double arr_volume_weighted_global_J_21[120];
+
 void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
 {
   physics_params_t* params = &(run_globals.params.physics);
@@ -249,6 +265,21 @@ void call_ComputeTs(int snapshot, int nout_gals, timer_info* timer)
 
   ComputeTs(snapshot, timer);
   mlog("...done", MLOG_CLOSE | MLOG_TIMERSTOP);
+  
+  arr_volume_weighted_global_xH[snapshot] = grids->volume_weighted_global_xH;
+  arr_mass_weighted_global_xH[snapshot] = grids->mass_weighted_global_xH;
+
+  arr_volume_ave_TS[snapshot] = grids->volume_ave_TS;
+  arr_volume_ave_TK[snapshot] = grids->volume_ave_TK;
+  arr_volume_ave_xe[snapshot] = grids->volume_ave_xe;
+
+  arr_volume_ave_J_alpha[snapshot] = grids->volume_ave_J_alpha;
+  arr_volume_ave_xalpha[snapshot] = grids->volume_ave_xalpha;
+  arr_volume_ave_Xheat[snapshot] = grids->volume_ave_Xheat;
+  arr_volume_ave_Xion[snapshot] = grids->volume_ave_Xion;
+
+  arr_volume_ave_Tb[snapshot] = grids->volume_ave_Tb;
+  arr_volume_weighted_global_J_21[snapshot] = grids->volume_weighted_global_J_21;
 }
 
 void init_reion_grids()
@@ -1158,8 +1189,7 @@ static void write_grid_float(const char* name,
                              hid_t file_id,
                              hid_t fspace_id,
                              hid_t memspace_id,
-                             hid_t dcpl_id)
-{
+                             hid_t dcpl_id){
   // create the dataset
   hid_t dset_id = H5Dcreate(file_id, name, H5T_NATIVE_FLOAT, fspace_id, H5P_DEFAULT, dcpl_id, H5P_DEFAULT);
 
@@ -1281,25 +1311,25 @@ void save_reion_output_grids(int snapshot)
   hid_t file_id = H5Fopen(name, H5F_ACC_RDWR, plist_id);
   H5Pclose(plist_id);
 
-  // create the filespace
-  hsize_t dims[3] = { (hsize_t)ReionGridDim, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim };
-  hid_t fspace_id = H5Screate_simple(3, dims, NULL);
+  // // create the filespace
+  // hsize_t dims[3] = { (hsize_t)ReionGridDim, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim };
+  // hid_t fspace_id = H5Screate_simple(3, dims, NULL);
 
-  // create the memspace
-  hsize_t mem_dims[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim };
-  hid_t memspace_id = H5Screate_simple(3, mem_dims, NULL);
+  // // create the memspace
+  // hsize_t mem_dims[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim };
+  // hid_t memspace_id = H5Screate_simple(3, mem_dims, NULL);
 
-  // select a hyperslab in the filespace
-  hsize_t start[3] = { (hsize_t)run_globals.reion_grids.slab_ix_start[run_globals.mpi_rank], 0, 0 };
-  hsize_t count[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim };
-  H5Sselect_hyperslab(fspace_id, H5S_SELECT_SET, start, NULL, count, NULL);
+  // // select a hyperslab in the filespace
+  // hsize_t start[3] = { (hsize_t)run_globals.reion_grids.slab_ix_start[run_globals.mpi_rank], 0, 0 };
+  // hsize_t count[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim };
+  // H5Sselect_hyperslab(fspace_id, H5S_SELECT_SET, start, NULL, count, NULL);
 
-  // set the dataset creation property list to use chunking along x-axis
-  hid_t dcpl_id = H5Pcreate(H5P_DATASET_CREATE);
-  H5Pset_chunk(dcpl_id, 3, (hsize_t[3]){ 1, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim });
+  // // set the dataset creation property list to use chunking along x-axis
+  // hid_t dcpl_id = H5Pcreate(H5P_DATASET_CREATE);
+  // H5Pset_chunk(dcpl_id, 3, (hsize_t[3]){ 1, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim });
 
-  // create and write the datasets
-  write_grid_float("xH", grids->xH, file_id, fspace_id, memspace_id, dcpl_id);
+  // // create and write the datasets
+  // write_grid_float("xH", grids->xH, file_id, fspace_id, memspace_id, dcpl_id);
   // write_grid_float("z_at_ionization", grids->z_at_ionization, file_id, fspace_id, memspace_id, dcpl_id);
   // write_grid_float("r_bubble", grids->r_bubble, file_id, fspace_id, memspace_id, dcpl_id);
 
@@ -1311,7 +1341,7 @@ void save_reion_output_grids(int snapshot)
   // }
 
   // fftw padded grids
-  float* grid = (float*)calloc((size_t)(local_nix * ReionGridDim * ReionGridDim), sizeof(float));
+  // float* grid = (float*)calloc((size_t)(local_nix * ReionGridDim * ReionGridDim), sizeof(float));
 
   // if (run_globals.params.Flag_IncludeSpinTemp) {
   //   write_grid_float("TS_box", grids->TS_box, file_id, fspace_id, memspace_id, dcpl_id);
@@ -1375,25 +1405,41 @@ void save_reion_output_grids(int snapshot)
     // cleanup
     H5Pclose(plist_id);
     H5Dclose(dset_id);
+
+    H5LTset_attribute_double(file_id, "LightconeBox", "volume_weighted_global_xH", &(arr_volume_weighted_global_xH), 120);
+    H5LTset_attribute_double(file_id, "LightconeBox", "volume_weighted_global_xH", &(arr_volume_weighted_global_xH), 120);
+    H5LTset_attribute_double(file_id, "LightconeBox", "mass_weighted_global_xH", &(arr_mass_weighted_global_xH), 120);
+
+    H5LTset_attribute_double(file_id, "LightconeBox", "volume_ave_TS", &(arr_volume_ave_TS), 120);
+    H5LTset_attribute_double(file_id, "LightconeBox", "volume_ave_TK", &(arr_volume_ave_TK), 120);
+    H5LTset_attribute_double(file_id, "LightconeBox", "volume_ave_xe", &(arr_volume_ave_xe), 120);
+
+    H5LTset_attribute_double(file_id, "LightconeBox", "volume_ave_J_alpha", &(arr_volume_ave_J_alpha), 120);
+    H5LTset_attribute_double(file_id, "LightconeBox", "volume_ave_xalpha", &(arr_volume_ave_xalpha), 120);
+    H5LTset_attribute_double(file_id, "LightconeBox", "volume_ave_Xheat", &(arr_volume_ave_Xheat), 120);
+    H5LTset_attribute_double(file_id, "LightconeBox", "volume_ave_Xion", &(arr_volume_ave_Xion), 120);
+ 
+    H5LTset_attribute_double(file_id, "LightconeBox", "volume_ave_Tb", &(arr_volume_ave_Tb), 120);
+    H5LTset_attribute_double(file_id, "LightconeBox", "volume_ave_Tb", &(arr_volume_weighted_global_J_21), 120);
   }
 
-  H5LTset_attribute_double(file_id, "xH", "volume_weighted_global_xH", &(grids->volume_weighted_global_xH), 1);
-  H5LTset_attribute_double(file_id, "xH", "mass_weighted_global_xH", &(grids->mass_weighted_global_xH), 1);
+  // H5LTset_attribute_double(file_id, "xH", "volume_weighted_global_xH", &(grids->volume_weighted_global_xH), 1);
+  // H5LTset_attribute_double(file_id, "xH", "mass_weighted_global_xH", &(grids->mass_weighted_global_xH), 1);
 
-  if (run_globals.params.Flag_IncludeSpinTemp) {
-    H5LTset_attribute_double(file_id, "xH", "volume_ave_TS", &(grids->volume_ave_TS), 1);
-    H5LTset_attribute_double(file_id, "xH", "volume_ave_TK", &(grids->volume_ave_TK), 1);
-    H5LTset_attribute_double(file_id, "xH", "volume_ave_xe", &(grids->volume_ave_xe), 1);
+  // if (run_globals.params.Flag_IncludeSpinTemp) {
+  //   H5LTset_attribute_double(file_id, "xH", "volume_ave_TS", &(grids->volume_ave_TS), 1);
+  //   H5LTset_attribute_double(file_id, "xH", "volume_ave_TK", &(grids->volume_ave_TK), 1);
+  //   H5LTset_attribute_double(file_id, "xH", "volume_ave_xe", &(grids->volume_ave_xe), 1);
 
-    H5LTset_attribute_double(file_id, "xH", "volume_ave_J_alpha", &(grids->volume_ave_J_alpha), 1);
-    H5LTset_attribute_double(file_id, "xH", "volume_ave_xalpha", &(grids->volume_ave_xalpha), 1);
-    H5LTset_attribute_double(file_id, "xH", "volume_ave_Xheat", &(grids->volume_ave_Xheat), 1);
-    H5LTset_attribute_double(file_id, "xH", "volume_ave_Xion", &(grids->volume_ave_Xion), 1);
-  }
+  //   H5LTset_attribute_double(file_id, "xH", "volume_ave_J_alpha", &(grids->volume_ave_J_alpha), 1);
+  //   H5LTset_attribute_double(file_id, "xH", "volume_ave_xalpha", &(grids->volume_ave_xalpha), 1);
+  //   H5LTset_attribute_double(file_id, "xH", "volume_ave_Xheat", &(grids->volume_ave_Xheat), 1);
+  //   H5LTset_attribute_double(file_id, "xH", "volume_ave_Xion", &(grids->volume_ave_Xion), 1);
+  // }
 
-  if (run_globals.params.Flag_Compute21cmBrightTemp) {
-    H5LTset_attribute_double(file_id, "xH", "volume_ave_Tb", &(grids->volume_ave_Tb), 1);
-  }
+  // if (run_globals.params.Flag_Compute21cmBrightTemp) {
+  //   H5LTset_attribute_double(file_id, "xH", "volume_ave_Tb", &(grids->volume_ave_Tb), 1);
+  // }
 
   // if (run_globals.params.Flag_ComputePS) {
 
