@@ -1311,24 +1311,24 @@ void save_reion_output_grids(int snapshot)
   hid_t file_id = H5Fopen(name, H5F_ACC_RDWR, plist_id);
   H5Pclose(plist_id);
 
-  // // create the filespace
-  // hsize_t dims[3] = { (hsize_t)ReionGridDim, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim };
-  // hid_t fspace_id = H5Screate_simple(3, dims, NULL);
+  // create the filespace
+  hsize_t dims[3] = { (hsize_t)ReionGridDim, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim };
+  hid_t fspace_id = H5Screate_simple(3, dims, NULL);
 
-  // // create the memspace
-  // hsize_t mem_dims[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim };
-  // hid_t memspace_id = H5Screate_simple(3, mem_dims, NULL);
+  // create the memspace
+  hsize_t mem_dims[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim };
+  hid_t memspace_id = H5Screate_simple(3, mem_dims, NULL);
 
-  // // select a hyperslab in the filespace
-  // hsize_t start[3] = { (hsize_t)run_globals.reion_grids.slab_ix_start[run_globals.mpi_rank], 0, 0 };
-  // hsize_t count[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim };
-  // H5Sselect_hyperslab(fspace_id, H5S_SELECT_SET, start, NULL, count, NULL);
+  // select a hyperslab in the filespace
+  hsize_t start[3] = { (hsize_t)run_globals.reion_grids.slab_ix_start[run_globals.mpi_rank], 0, 0 };
+  hsize_t count[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim };
+  H5Sselect_hyperslab(fspace_id, H5S_SELECT_SET, start, NULL, count, NULL);
 
-  // // set the dataset creation property list to use chunking along x-axis
-  // hid_t dcpl_id = H5Pcreate(H5P_DATASET_CREATE);
-  // H5Pset_chunk(dcpl_id, 3, (hsize_t[3]){ 1, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim });
+  // set the dataset creation property list to use chunking along x-axis
+  hid_t dcpl_id = H5Pcreate(H5P_DATASET_CREATE);
+  H5Pset_chunk(dcpl_id, 3, (hsize_t[3]){ 1, (hsize_t)ReionGridDim, (hsize_t)ReionGridDim });
 
-  // // create and write the datasets
+  // create and write the datasets
   // write_grid_float("xH", grids->xH, file_id, fspace_id, memspace_id, dcpl_id);
   // write_grid_float("z_at_ionization", grids->z_at_ionization, file_id, fspace_id, memspace_id, dcpl_id);
   // write_grid_float("r_bubble", grids->r_bubble, file_id, fspace_id, memspace_id, dcpl_id);
