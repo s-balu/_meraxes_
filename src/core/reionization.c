@@ -1491,7 +1491,7 @@ void save_reion_output_grids(int snapshot)
   // }
 
   // tidy up
-  free(grid);
+  // free(grid);
   H5Pclose(dcpl_id);
   H5Sclose(memspace_id);
   H5Sclose(fspace_id);
