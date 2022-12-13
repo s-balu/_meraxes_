@@ -356,12 +356,14 @@ typedef struct reion_grids_t
   // Grids necessary for the 21cm brightness temperature
   float* delta_T;
   float* delta_T_prev;
+  float* xH_prev;
   float* vel;
   fftwf_complex* vel_gradient;
   fftwf_plan vel_forward_plan;
   fftwf_plan vel_gradient_reverse_plan;
 
   // Grid for the lightcone (cuboid) box
+  float* xH_LightconeBox;
   float* LightconeBox;
   float* Lightcone_redshifts;
 

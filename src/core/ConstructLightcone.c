@@ -73,6 +73,9 @@ void ConstructLightcone(int snapshot)
   float* delta_T = run_globals.reion_grids.delta_T;
   float* delta_T_prev = run_globals.reion_grids.delta_T_prev;
 
+  float* xH = run_globals.reion_grids.xH;
+  float* xH_prev = run_globals.reion_grids.xH_prev;
+
   float* Lightcone_redshifts = run_globals.reion_grids.Lightcone_redshifts;
 
   int ReionGridDim = run_globals.params.ReionGridDim;
@@ -82,7 +85,7 @@ void ConstructLightcone(int snapshot)
   double box_size = run_globals.params.BoxSize / run_globals.params.Hubble_h; // Mpc
   double dR = (box_size / (double)ReionGridDim) * MPC;                        // cell size in comoving cm
 
-  double z_LC, z1_LC, z2_LC, t_z1_LC, t_z2_LC, z_slice, t_z_slice, fz1, fz2;
+  double z_LC, z1_LC, z2_LC, t_z1_LC, t_z2_LC, z_slice, t_z_slice, fz1, fz2, fz1_xH, fz2_xH;
 
   long long slice_ct = 0;
   long long slice_ct_snapshot = 0;
@@ -148,6 +151,12 @@ void ConstructLightcone(int snapshot)
             run_globals.reion_grids.LightconeBox[i_real_LC] =
               (float)((fz2 - fz1) / (t_z2_LC - t_z1_LC) * (t_z_slice - t_z1_LC) +
                       fz1); // linearly interpolate in z (time actually)
+            
+            fz1_xH = xH[i_real];
+            fz2_xH = xH_prev[i_real];
+            run_globals.reion_grids.xH_LightconeBox[i_real_LC] =
+              (float)((fz2_xH - fz1_xH) / (t_z2_LC - t_z1_LC) * (t_z_slice - t_z1_LC) +
+                      fz1_xH); // linearly interpolate in z (time actually)  
           }
         }
 
@@ -163,4 +172,6 @@ void ConstructLightcone(int snapshot)
 
   // Update the previous delta_T box with the one we just finished using
   memcpy(delta_T_prev, delta_T, sizeof(float) * slab_n_real);
+  memcpy(xH_prev, xH, sizeof(float) * slab_n_real);
+
 }
