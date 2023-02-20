@@ -75,7 +75,7 @@ void update_galaxy_fesc_vals(galaxy_t* gal, double new_stars, int snapshot)
         fesc = 1.0;
       break;*/
     case 5: // halo mass (1e10 Msun units)
-/*      if (gal->Mvir > 0.0)
+      /*if (gal->Mvir > 0.0)
         fesc *= pow(gal->Mvir * 10. / run_globals.params.Hubble_h, params->EscapeFracPropScaling);
       else
         fesc = 1.0;
