@@ -167,7 +167,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
     }
 
     // Initialise filters
-    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, jwst_transmission_splined, jwst_lambda_splined, jwst_number, N_JWST, redshifts[nAgeStep]);
+    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, jwst_transmission_splined, jwst_lambda_splined, jwst_number, 1, redshifts[nAgeStep]);
     for (iwave=0; iwave<MAGS_N_BANDS; iwave++){
       //  mlog("iwave = %d: spectra.centreWave=%.1f",MLOG_MESG, iwave, spectra[iS].centreWaves[iwave]);
         miniSpectra->allcentreWaves[iS][iwave] = spectra[iS].centreWaves[iwave];
@@ -200,9 +200,9 @@ void init_templates_mini(mag_params_t* miniSpectra,
     free(jwst_lambda_splined);
   }
   free(jwst_number);
-  for (iband=0; iband<N_JWST; iband++){
-    gsl_spline_free(spline[iband]);
-    gsl_interp_accel_free(acc[iband]);
+  for (iband=0; iband<1; iband++){
+    gsl_spline_free(spline);
+    gsl_interp_accel_free(acc);
   }
 
   // Initialise mini templates
@@ -220,9 +220,9 @@ void init_templates_mini(mag_params_t* miniSpectra,
     totalSize += targetSnap[iS];
   totalSize *= nMaxZ * MAGS_N_BANDS;
   // Compute size of special templates
-  totalSize += N_JWST * MAGS_N_SNAPS * nMaxZ * MAGS_N_BANDS;
+  totalSize += 1 * MAGS_N_SNAPS * nMaxZ * MAGS_N_BANDS;
   //  Compute size of wavelengths
-  totalSize += N_JWST * MAGS_N_BANDS;
+  totalSize += 1 * MAGS_N_BANDS;
   totalSize *= sizeof(double);
   //
   working = (double*)malloc(totalSize);
@@ -378,7 +378,7 @@ void init_magnitudes(void)
     for (int i_band = 0; i_band < n_rest; ++i_band)
       mlog("#\t%.1f AA to %.1f", MLOG_MESG, rest_bands[2 * i_band], rest_bands[2 * i_band + 1]);
     //
-    if (n_beta + n_rest + N_JWST!= MAGS_N_BANDS) {
+    if (n_beta + n_rest + 1!= MAGS_N_BANDS) {
       mlog_error("Number of beta and rest-frame filters do not match MAGS_N_BANDS!", MLOG_MESG);
       ABORT(EXIT_FAILURE);
     }
