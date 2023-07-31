@@ -91,8 +91,6 @@ void merge_luminosities(galaxy_t* target, galaxy_t* gal)
   }
 }
 
-#define N_JWST 8
-
 void init_templates_mini(mag_params_t* miniSpectra,
                          char* fName,
                          double* LTTime,
@@ -116,36 +114,16 @@ void init_templates_mini(mag_params_t* miniSpectra,
   int nAgeStep;
   double* ageStep;
   FILE *ptr;
-  int jwst_filename[N_JWST] = {70, 90, 115, 150, 200, 277, 356, 444};
-  int jwst_length[N_JWST] = {400, 302, 601, 1598, 1198, 1425, 1346, 1452};
-  double *jwst_lambda[N_JWST];
-  double *jwst_transmission[N_JWST];
-  static gsl_interp_accel* acc[N_JWST];
-  static gsl_spline* spline[N_JWST];
+  double *jwst_lambda;
+  double *jwst_transmission;
+  static gsl_interp_accel* acc;
+  static gsl_spline* spline;
   char fname[STRLEN];
-
-  for (iband=0; iband<N_JWST; iband++){
-      jwst_lambda[iband] = (double*)malloc(jwst_length[iband]*sizeof(double));
-      jwst_transmission[iband] = (double*)malloc(jwst_length[iband]*sizeof(double));
-      sprintf(fname, "%s/NIRCam_Wide/F%03dW_wavelength.bin", run_globals.params.PhotometricTablesDir, jwst_filename[iband]);
-      ptr = fopen(fname, "rb");
-      fread(jwst_lambda[iband], jwst_length[iband]*sizeof(double), 1, ptr);
-      fclose(ptr);
-
-      sprintf(fname, "%s/NIRCam_Wide/F%03dW_transmission.bin", run_globals.params.PhotometricTablesDir, jwst_filename[iband]);
-      ptr = fopen(fname, "rb");
-      fread(jwst_transmission[iband], jwst_length[iband]*sizeof(double), 1, ptr);
-      fclose(ptr);
-
-      acc[iband] = gsl_interp_accel_alloc();
-      spline[iband] = gsl_spline_alloc(gsl_interp_linear, jwst_length[iband]);
-      gsl_spline_init(spline[iband], jwst_lambda[iband], jwst_transmission[iband], jwst_length[iband]);
-  }
 
   int iwave;
   double *jwst_transmission_splined, *jwst_lambda_splined;
   int *jwst_number;
-  jwst_number = (int *)calloc(N_JWST, sizeof(int));
+  jwst_number = (int *)calloc(1, sizeof(int));
   int iwave_offset, n_splined;
 
 /*  for (iband=0; iband<N_JWST; iband++){
@@ -159,8 +137,8 @@ void init_templates_mini(mag_params_t* miniSpectra,
     init_templates_raw(spectra + iS, fName);
 
     n_splined = 0;
-    for (iband=0; iband<N_JWST; iband++){
-        jwst_number[iband] = spectra[iS].nWaves;
+    for (iband=0; iband<1; iband++){
+        jwst_number = spectra[iS].nWaves;
         n_splined+=jwst_number[iband];
     }
 
@@ -170,7 +148,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
     
 
     iwave_offset = 0;
-    for (iband=0; iband<N_JWST; iband++){
+    for (iband=0; iband<1; iband++){
         for (iwave=0; iwave<jwst_number[iband]; iwave++){
             if (iwave==0)
                 jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] +1e-4);
@@ -178,11 +156,11 @@ void init_templates_mini(mag_params_t* miniSpectra,
                 jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] -1e-4);
             else
                 jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]);
-            if (jwst_lambda_splined[iwave+iwave_offset] < jwst_lambda[iband][0] || jwst_lambda_splined[iwave+iwave_offset]>jwst_lambda[iband][jwst_length[iband]-1])
+
+            if (jwst_lambda_splined[iwave+iwave_offset]>91200)
                 jwst_transmission_splined[iwave+iwave_offset] = 0;
             else{
-                jwst_transmission_splined[iwave+iwave_offset] = gsl_spline_eval(spline[iband], jwst_lambda_splined[iwave+iwave_offset], acc[iband]);
-                //mlog("iband=%d; iwave = %d: spectra.waves=%.1f, jwst_lambda_splined=%.1f, jwst_transmission_splined=%.6f",MLOG_MESG,iband, iwave, spectra[iS].waves[iwave+iwave_offset], jwst_lambda_splined[iwave+iwave_offset], jwst_transmission_splined[iwave+iwave_offset]);
+                jwst_transmission_splined[iwave+iwave_offset] = 1;
             }
         }
         iwave_offset += jwst_number[iband];
