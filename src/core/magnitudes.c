@@ -138,7 +138,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
 
     n_splined = 0;
     for (iband=0; iband<1; iband++){
-        jwst_number = spectra[iS].nWaves;
+        jwst_number[iband] = spectra[iS].nWaves;
         n_splined+=jwst_number[iband];
     }
 
