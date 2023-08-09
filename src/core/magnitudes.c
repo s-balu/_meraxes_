@@ -91,6 +91,7 @@ void merge_luminosities(galaxy_t* target, galaxy_t* gal)
   }
 }
 
+#define N_JWST 1
 void init_templates_mini(mag_params_t* miniSpectra,
                          char* fName,
                          double* LTTime,
@@ -114,17 +115,16 @@ void init_templates_mini(mag_params_t* miniSpectra,
   int nAgeStep;
   double* ageStep;
   FILE *ptr;
-  double *jwst_lambda;
-  double *jwst_transmission;
-  static gsl_interp_accel* acc;
-  static gsl_spline* spline;
+  double *jwst_lambda[N_JWST];
+  double *jwst_transmission[N_JWST];
+  static gsl_interp_accel* acc[N_JWST];
+  static gsl_spline* spline[N_JWST];
   char fname[STRLEN];
 
   int iwave;
   double *jwst_transmission_splined, *jwst_lambda_splined;
   int *jwst_number;
-  int JWST_blah = 1;
-  jwst_number = (int *)calloc(JWST_blah, sizeof(int));
+  jwst_number = (int *)calloc(N_JWST, sizeof(int));
   int iwave_offset, n_splined;
 
 /*  for (iband=0; iband<N_JWST; iband++){
@@ -149,7 +149,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
     
 
     iwave_offset = 0;
-    for (iband=0; iband<1; iband++){
+    for (iband=0; iband<N_JWST; iband++){
         for (iwave=0; iwave<jwst_number[iband]; iwave++){
             if (iwave==0)
                 jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] +1e-4);
@@ -168,7 +168,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
     }
 
     // Initialise filters
-    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, jwst_transmission_splined, jwst_lambda_splined, jwst_number, 1, redshifts[nAgeStep]);
+    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, jwst_transmission_splined, jwst_lambda_splined, jwst_number, N_JWST, redshifts[nAgeStep]);
     for (iwave=0; iwave<MAGS_N_BANDS; iwave++){
     // for (iwave=0; iwave<MAGS_N_BANDS; ++iwave){
        mlog("iwave = %d: spectra.centreWave=%.1f",MLOG_MESG, iwave, spectra[iS].centreWaves[iwave]);
@@ -202,9 +202,9 @@ void init_templates_mini(mag_params_t* miniSpectra,
     free(jwst_lambda_splined);
   }
   free(jwst_number);
-  for (iband=0; iband<1; iband++){
-    gsl_spline_free(spline);
-    gsl_interp_accel_free(acc);
+  for (iband=0; iband<N_JWST; iband++){
+    gsl_spline_free(spline[iband]);
+    gsl_interp_accel_free(acc[iband]);
   }
 
   // Initialise mini templates
@@ -222,9 +222,9 @@ void init_templates_mini(mag_params_t* miniSpectra,
     totalSize += targetSnap[iS];
   totalSize *= nMaxZ * MAGS_N_BANDS;
   // Compute size of special templates
-  totalSize += 1 * MAGS_N_SNAPS * nMaxZ * MAGS_N_BANDS;
+  totalSize += N_JWST * MAGS_N_SNAPS * nMaxZ * MAGS_N_BANDS;
   //  Compute size of wavelengths
-  totalSize += 1 * MAGS_N_BANDS;
+  totalSize += N_JWST * MAGS_N_BANDS;
   totalSize *= sizeof(double);
   //
   working = (double*)malloc(totalSize);
@@ -380,7 +380,7 @@ void init_magnitudes(void)
     for (int i_band = 0; i_band < n_rest; ++i_band)
       mlog("#\t%.1f AA to %.1f", MLOG_MESG, rest_bands[2 * i_band], rest_bands[2 * i_band + 1]);
     //
-    if (n_beta + n_rest + 1!= MAGS_N_BANDS) {
+    if (n_beta + n_rest + N_JWST!= MAGS_N_BANDS) {
       mlog_error("Number of beta and rest-frame filters do not match MAGS_N_BANDS!", MLOG_MESG);
       ABORT(EXIT_FAILURE);
     }
