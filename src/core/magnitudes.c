@@ -7,10 +7,6 @@
 #include "misc_tools.h"
 #include "parse_paramfile.h"
 
-#include <gsl/gsl_interp.h>
-#include <gsl/gsl_spline.h>
-
-
 void init_luminosities(galaxy_t* gal)
 {
   // Initialise all elements of flux arrays to TOL.
@@ -109,34 +105,17 @@ void init_templates_mini(mag_params_t* miniSpectra,
   // block.
 
   // Initialise full templates
-  int iS;
+  int iS, iwave;
   struct sed_params_t spectra[MAGS_N_SNAPS];
   int nAgeStep;
   double* ageStep;
-
-  int iwave;
-  double *jwst_transmission_splined, *jwst_lambda_splined;
 
   for (iS = 0; iS < MAGS_N_SNAPS; ++iS) {
     nAgeStep = targetSnap[iS];
     // Initialise raw templates
     init_templates_raw(spectra + iS, fName);
-    jwst_transmission_splined = (double*)malloc(spectra[iS].nWaves*sizeof(double));
-    jwst_lambda_splined = (double*)malloc(spectra[iS].nWaves*sizeof(double));
-    
-    for (iwave=0; iwave<spectra[iS].nWaves; iwave++){
-        if (iwave==0)
-            jwst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] +1e-4);
-        else if (iwave==spectra[iS].nWaves-1)
-            jwst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] -1e-4);
-        else
-            jwst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]);
-		jwst_transmission_splined[iwave] = (jwst_lambda_splined[iwave]>91200) ? 1:0;
-//		printf("%f\n", spectra[iS].Z[iwave]);
-    }
-
     // Initialise filters
-    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, jwst_transmission_splined, jwst_lambda_splined, &(spectra[iS].nWaves), 1, redshifts[nAgeStep]);
+    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, NULL, NULL, NULL, 0, redshifts[nAgeStep]);
     for (iwave=0; iwave<MAGS_N_BANDS; iwave++){
       //  mlog("iwave = %d: spectra.centreWave=%.1f",MLOG_MESG, iwave, spectra[iS].centreWaves[iwave]);
         miniSpectra->allcentreWaves[iS][iwave] = spectra[iS].centreWaves[iwave];
@@ -165,8 +144,6 @@ void init_templates_mini(mag_params_t* miniSpectra,
     init_templates_working(spectra + iS, NULL, NULL, -1);
     // Initialise special templates for birth cloud
     init_templates_special(spectra + iS, tBC, 1);
-    free(jwst_transmission_splined);
-    free(jwst_lambda_splined);
   }
 
   // Initialise mini templates
@@ -184,9 +161,9 @@ void init_templates_mini(mag_params_t* miniSpectra,
     totalSize += targetSnap[iS];
   totalSize *= nMaxZ * MAGS_N_BANDS;
   // Compute size of special templates
-  totalSize += MAGS_N_SNAPS * nMaxZ * MAGS_N_BANDS;
+  totalSize += 2 * MAGS_N_SNAPS * nMaxZ * MAGS_N_BANDS;
   //  Compute size of wavelengths
-  totalSize += MAGS_N_BANDS;
+  totalSize += 2 * MAGS_N_BANDS;
   totalSize *= sizeof(double);
   //
   working = (double*)malloc(totalSize);
@@ -342,7 +319,7 @@ void init_magnitudes(void)
     for (int i_band = 0; i_band < n_rest; ++i_band)
       mlog("#\t%.1f AA to %.1f", MLOG_MESG, rest_bands[2 * i_band], rest_bands[2 * i_band + 1]);
     //
-    if (n_beta + n_rest + 1!= MAGS_N_BANDS) {
+    if (n_beta + n_rest != MAGS_N_BANDS) {
       mlog_error("Number of beta and rest-frame filters do not match MAGS_N_BANDS!", MLOG_MESG);
       ABORT(EXIT_FAILURE);
     }
