@@ -142,7 +142,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
         jwst_number[iband] = spectra[iS].nWaves;
         n_splined+=jwst_number[iband];
     }
-
+    mlog("n_splined = %d", MLOG_MESG, n_splined);
     jwst_transmission_splined = (double*)malloc(n_splined*sizeof(double));
     jwst_lambda_splined = (double*)malloc(n_splined*sizeof(double));
     mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[nAgeStep]);
@@ -166,7 +166,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
         }
         iwave_offset += jwst_number[iband];
     }
-
+    
     // Initialise filters
     init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, jwst_transmission_splined, jwst_lambda_splined, jwst_number, N_JWST, redshifts[nAgeStep]);
     for (iwave=0; iwave<MAGS_N_BANDS; iwave++){
@@ -273,19 +273,33 @@ void init_templates_mini(mag_params_t* miniSpectra,
   // Free full templates
   for (iS = 0; iS < MAGS_N_SNAPS; ++iS) {
     free(spectra[iS].Z);
+    mlog("freed Z", MLOG_MESG);
     free(spectra[iS].waves);
+    mlog("freed waves", MLOG_MESG);
     free(spectra[iS].age);
+    mlog("freed age", MLOG_MESG);
     free(spectra[iS].raw);
+    mlog("freed raw", MLOG_MESG);
     free(spectra[iS].nFilterWaves);
+    mlog("freed nFilterWaves", MLOG_MESG);
     free(spectra[iS].filterWaves);
+    mlog("freed filterWaves", MLOG_MESG);
     free(spectra[iS].filters);
+    mlog("freed filters", MLOG_MESG);
     free(spectra[iS].integrated);
+    mlog("freed integrated", MLOG_MESG);
     free(spectra[iS].ready);
+    mlog("freed ready", MLOG_MESG);
     free(spectra[iS].working);
+    mlog("freed working", MLOG_MESG);
     free(spectra[iS].inBC);
+    mlog("freed inBC", MLOG_MESG);
     free(spectra[iS].outBC);
+    mlog("freed outBC", MLOG_MESG);
     free(spectra[iS].centreWaves);
+    mlog("freed centreWaves", MLOG_MESG);
     free(spectra[iS].logWaves);
+    mlog("freed logWaves", MLOG_MESG);
   }
 }
 
