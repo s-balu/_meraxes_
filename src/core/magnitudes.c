@@ -123,7 +123,8 @@ void init_templates_mini(mag_params_t* miniSpectra,
   int iwave;
   double *jwst_transmission_splined, *jwst_lambda_splined;
   int *jwst_number;
-  jwst_number = (int *)calloc(1, sizeof(int));
+  int JWST_blah = 1;
+  jwst_number = (int *)calloc(JWST_blah, sizeof(int));
   int iwave_offset, n_splined;
 
 /*  for (iband=0; iband<N_JWST; iband++){
@@ -144,7 +145,7 @@ void init_templates_mini(mag_params_t* miniSpectra,
 
     jwst_transmission_splined = (double*)malloc(n_splined*sizeof(double));
     jwst_lambda_splined = (double*)malloc(n_splined*sizeof(double));
-    //mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[nAgeStep]);
+    mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[nAgeStep]);
     
 
     iwave_offset = 0;
@@ -169,7 +170,8 @@ void init_templates_mini(mag_params_t* miniSpectra,
     // Initialise filters
     init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, jwst_transmission_splined, jwst_lambda_splined, jwst_number, 1, redshifts[nAgeStep]);
     for (iwave=0; iwave<MAGS_N_BANDS; iwave++){
-      //  mlog("iwave = %d: spectra.centreWave=%.1f",MLOG_MESG, iwave, spectra[iS].centreWaves[iwave]);
+    // for (iwave=0; iwave<MAGS_N_BANDS; ++iwave){
+       mlog("iwave = %d: spectra.centreWave=%.1f",MLOG_MESG, iwave, spectra[iS].centreWaves[iwave]);
         miniSpectra->allcentreWaves[iS][iwave] = spectra[iS].centreWaves[iwave];
     }
 
