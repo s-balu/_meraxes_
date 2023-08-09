@@ -109,58 +109,34 @@ void init_templates_mini(mag_params_t* miniSpectra,
   // block.
 
   // Initialise full templates
-  int iS, iband;
+  int iS;
   struct sed_params_t spectra[MAGS_N_SNAPS];
   int nAgeStep;
   double* ageStep;
-  FILE *ptr;
-  double *jwst_lambda;
-  double *jwst_transmission;
-  char fname[STRLEN];
 
   int iwave;
   double *jwst_transmission_splined, *jwst_lambda_splined;
-  int *jwst_number;
-  jwst_number = (int *)calloc(1, sizeof(int));
-  int iwave_offset, n_splined;
 
   for (iS = 0; iS < MAGS_N_SNAPS; ++iS) {
     nAgeStep = targetSnap[iS];
     // Initialise raw templates
     init_templates_raw(spectra + iS, fName);
-
-    n_splined = 0;
-    for (iband=0; iband<1; iband++){
-        jwst_number = spectra[iS].nWaves;
-        n_splined+=jwst_number[iband];
-    }
-
-    jwst_transmission_splined = (double*)malloc(n_splined*sizeof(double));
-    jwst_lambda_splined = (double*)malloc(n_splined*sizeof(double));
-    //mlog("iS = %d/%d: nWaves=%d, z=%.1f",MLOG_MESG,iS, MAGS_N_SNAPS, spectra[iS].nWaves, redshifts[nAgeStep]);
+    jwst_transmission_splined = (double*)malloc(spectra[iS].nWaves*sizeof(double));
+    jwst_lambda_splined = (double*)malloc(spectra[iS].nWaves*sizeof(double));
     
-
-    iwave_offset = 0;
-    for (iband=0; iband<1; iband++){
-        for (iwave=0; iwave<jwst_number[iband]; iwave++){
-            if (iwave==0)
-                jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] +1e-4);
-            else if (iwave==jwst_number[iband]-1)
-                jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] -1e-4);
-            else
-                jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]);
-
-            if (jwst_lambda_splined[iwave+iwave_offset]>91200)
-                jwst_transmission_splined[iwave+iwave_offset] = 0;
-            else{
-                jwst_transmission_splined[iwave+iwave_offset] = 1;
-            }
-        }
-        iwave_offset += jwst_number[iband];
+    for (iwave=0; iwave<spectra[iS].nWaves; iwave++){
+        if (iwave==0)
+            jwst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] +1e-4);
+        else if (iwave==spectra[iS].nWaves-1)
+            jwst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] -1e-4);
+        else
+            jwst_lambda_splined[iwave] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]);
+		jwst_transmission_splined[iwave] = (jwst_lambda_splined[iwave]>91200) ? 1:0;
+//		printf("%f\n", spectra[iS].Z[iwave]);
     }
 
     // Initialise filters
-    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, jwst_transmission_splined, jwst_lambda_splined, jwst_number, 1, redshifts[nAgeStep]);
+    init_filters(spectra + iS, betaBands, nBeta, restBands, nRest, jwst_transmission_splined, jwst_lambda_splined, &(spectra[iS].nWaves), 1, redshifts[nAgeStep]);
     for (iwave=0; iwave<MAGS_N_BANDS; iwave++){
       //  mlog("iwave = %d: spectra.centreWave=%.1f",MLOG_MESG, iwave, spectra[iS].centreWaves[iwave]);
         miniSpectra->allcentreWaves[iS][iwave] = spectra[iS].centreWaves[iwave];
@@ -192,7 +168,6 @@ void init_templates_mini(mag_params_t* miniSpectra,
     free(jwst_transmission_splined);
     free(jwst_lambda_splined);
   }
-  free(jwst_number);
 
   // Initialise mini templates
   int nSize = 0;
@@ -371,7 +346,7 @@ void init_magnitudes(void)
       mlog_error("Number of beta and rest-frame filters do not match MAGS_N_BANDS!", MLOG_MESG);
       ABORT(EXIT_FAILURE);
     }
-    mlog("#***********************************************************", MLOG_MESG);
+    mlog("#***********************************************************\n", MLOG_MESG);
 
     // Initialise SED templates
     char fname[STRLEN];
