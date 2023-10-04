@@ -32,7 +32,7 @@ galaxy_t* new_galaxy(int snapshot, unsigned long halo_ID)
   gal->Vvir = 0.0;
   gal->Vmax = 0.0;
   gal->Spin = 0.0;
-  // gal->DiskScaleLength = 0.0;
+  gal->DiskScaleLength = 0.0;
   gal->HotGas = 0.0;
   gal->MetalsHotGas = 0.0;
   gal->ColdGas = 0.0;
@@ -104,12 +104,12 @@ void copy_halo_props_to_galaxy(halo_t* halo, galaxy_t* gal)
 //  double sqrt_2 = 1.414213562;
   if (gal->Type == 0) {
     gal->Vmax = halo->Vmax;
-    //    gal->DiskScaleLength = gal->Spin * gal->Rvir / sqrt_2;
+    gal->DiskScaleLength = gal->Spin * gal->Rvir / sqrt_2;
   } else {
     if (!run_globals.params.physics.Flag_FixVmaxOnInfall)
       gal->Vmax = halo->Vmax;
-    //    if (!run_globals.params.physics.Flag_FixDiskRadiusOnInfall)
-    //      gal->DiskScaleLength = gal->Spin * gal->Rvir / sqrt_2;
+    if (!run_globals.params.physics.Flag_FixDiskRadiusOnInfall)
+    gal->DiskScaleLength = gal->Spin * gal->Rvir / sqrt_2;
   }
 
   for (int ii = 0; ii < 3; ii++) {

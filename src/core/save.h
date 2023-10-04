@@ -23,7 +23,7 @@ typedef struct galaxy_output_t
 
   float Pos[3];
   float Vel[3];
-  float Spin;
+  // float Spin;
   float Mvir;
   float Rvir;
   float Vvir;
@@ -39,7 +39,7 @@ typedef struct galaxy_output_t
   // float H2Mass;
   // float HIMass;
   //  float Mcool;
-  // float DiskScaleLength;
+  float DiskScaleLength;
   float StellarMass;
   float GrossStellarMass;
   float Fesc;
