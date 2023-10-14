@@ -119,7 +119,6 @@ void calc_hdf5_props()
     // Create datatypes for different size arrays
     h5props->array3f_tid = H5Tarray_create(H5T_NATIVE_FLOAT, 1, (hsize_t[]){ 3 });
     h5props->array_nhist_f_tid = H5Tarray_create(H5T_NATIVE_FLOAT, 1, (hsize_t[]){ N_HISTORY_SNAPS });
-  
     // Calculate the offsets of our struct members in memory
     h5props->dst_offsets = malloc(sizeof(size_t) * h5props->n_props);
     // Calculate the sizes of our struct members in memory.
@@ -309,8 +308,6 @@ void calc_hdf5_props()
     // h5props->field_h_conv[i] = "v/h";
     // h5props->field_types[i++] = H5T_NATIVE_FLOAT;
 
-    
-
     // h5props->dst_offsets[i] = HOFFSET(galaxy_output_t, BaryonFracModifier);
     // h5props->dst_field_sizes[i] = sizeof(galout.BaryonFracModifier);
     // h5props->field_names[i] = "BaryonFracModifier";
@@ -464,7 +461,7 @@ void create_master_file()
       if (run_globals.params.Flag_ConstructLightcone) {
         H5LTset_attribute_string(file_id, group_name, "LightconeBox", "mK");
         H5LTset_attribute_string(file_id, group_name, "xH_LightconeBox", "None");
-        H5LTset_attribute_string(file_id, group_name, "TS_LightconeBox", "mK");
+        H5LTset_attribute_string(file_id, group_name, "TS_LightconeBox", "K");
 
       }
 
