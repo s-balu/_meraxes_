@@ -1465,7 +1465,7 @@ void save_reion_output_grids(int snapshot)
     H5Pset_chunk(dcpl_id_TS_LC, 3, (hsize_t[3]){ 1, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength });
 
     mlog("Outputting TS light-cone", MLOG_MESG);
-    write_grid_float("TS_LightconeBox", grids->TS_LightconeBox, file_d, fspace_id_TS_LC, memspace_id_TS_LC, dcpl_id_TS_LC);
+    write_grid_float("TS_LightconeBox", grids->TS_LightconeBox, file_id, fspace_id_TS_LC, memspace_id_TS_LC, dcpl_id_TS_LC);
 
     // create the filespace //
     hsize_t dims_LCz[1] = { (hsize_t)run_globals.params.LightconeLength };

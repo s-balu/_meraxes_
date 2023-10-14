@@ -75,9 +75,9 @@ void ConstructLightcone(int snapshot)
 
   float* xH = run_globals.reion_grids.xH;
   float* xH_prev = run_globals.reion_grids.xH_prev;
-  
-  float* xH = run_globals.reion_grids.TS;
-  float* xH_prev = run_globals.reion_grids.TS_prev;
+
+  float* TS = run_globals.reion_grids.TS;
+  float* TS_prev = run_globals.reion_grids.TS_prev;
 
   float* Lightcone_redshifts = run_globals.reion_grids.Lightcone_redshifts;
 

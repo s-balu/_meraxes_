@@ -321,6 +321,7 @@ typedef struct reion_grids_t
   fftwf_plan weighted_sfr_filtered_reverse_plan;
 
   float* xH;
+  float* TS;
   float* z_at_ionization;
   float* J_21_at_ionization;
   float* J_21;
