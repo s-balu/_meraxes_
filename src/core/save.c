@@ -464,6 +464,7 @@ void create_master_file()
       if (run_globals.params.Flag_ConstructLightcone) {
         H5LTset_attribute_string(file_id, group_name, "LightconeBox", "mK");
         H5LTset_attribute_string(file_id, group_name, "xH_LightconeBox", "None");
+        H5LTset_attribute_string(file_id, group_name, "TS_LightconeBox", "mK");
 
       }
 
@@ -501,7 +502,7 @@ void create_master_file()
       if (run_globals.params.Flag_ConstructLightcone) {
         H5LTset_attribute_string(file_id, group_name, "LightconeBox", "None");
         H5LTset_attribute_string(file_id, group_name, "xH_LightconeBox", "None");
-
+        H5LTset_attribute_string(file_id, group_name, "TS_LightconeBox", "None");
       }
 
       if (run_globals.params.Flag_IncludeSpinTemp) {

@@ -265,7 +265,7 @@ void call_ComputeTs(int snapshot, int nout_gals, timer_info* timer)
 
   ComputeTs(snapshot, timer);
   mlog("...done", MLOG_CLOSE | MLOG_TIMERSTOP);
-  
+
   arr_volume_weighted_global_xH[snapshot] = grids->volume_weighted_global_xH;
   arr_mass_weighted_global_xH[snapshot] = grids->mass_weighted_global_xH;
 
@@ -307,6 +307,11 @@ void init_reion_grids()
       slab_n_real_xH_LC = slab_nix[run_globals.mpi_rank] * ReionGridDim * run_globals.params.LightconeLength;
   }
 
+  ptrdiff_t slab_n_real_TS_LC;
+  if (run_globals.params.Flag_ConstructLightcone) {
+      slab_n_real_TS_LC = slab_nix[run_globals.mpi_rank] * ReionGridDim * run_globals.params.LightconeLength;
+  }
+
   mlog("Initialising grids...", MLOG_MESG);
 
   grids->volume_weighted_global_xH = 1.0;
@@ -341,6 +346,8 @@ void init_reion_grids()
       if (run_globals.params.Flag_ConstructLightcone) {
         grids->delta_T_prev[ii] = 0.0;
         grids->xH_prev[ii] = 1.0;
+        grids->TS_prev[ii] = 1.0;
+
       }
     }
   }
@@ -360,9 +367,13 @@ void init_reion_grids()
     for (int ii = 0; ii < slab_n_real_LC; ii++) {
       grids->LightconeBox[ii] = 0.0;
     }
-    
+
     for (int ii = 0; ii < slab_n_real_xH_LC; ii++) {
       grids->xH_LightconeBox[ii] = 1.0;
+    }
+
+    for (int ii = 0; ii < slab_n_real_xH_LC; ii++) {
+      grids->TS_LightconeBox[ii] = 1.0;
     }
 
     for (int ii = 0; ii < run_globals.params.LightconeLength; ii++) {
@@ -515,10 +526,11 @@ void malloc_reionization_grids()
   grids->delta_T = NULL;
   grids->delta_T_prev = NULL;
   grids->xH_prev = NULL;
-
+  grids->TS_prev = NULL;
 
   // A grid for the lightcone (cuboid) box
   grids->xH_LightconeBox = NULL;
+  grids->TS_LightconeBox = NULL;
 
   grids->LightconeBox = NULL;
   grids->Lightcone_redshifts = NULL;
@@ -553,6 +565,11 @@ void malloc_reionization_grids()
     ptrdiff_t slab_n_real_xH_LC;
     if (run_globals.params.Flag_ConstructLightcone) {
       slab_n_real_xH_LC = slab_nix[run_globals.mpi_rank] * ReionGridDim * run_globals.params.LightconeLength;
+    }
+
+    ptrdiff_t slab_n_real_TS_LC;
+    if (run_globals.params.Flag_ConstructLightcone) {
+      slab_n_real_TS_LC = slab_nix[run_globals.mpi_rank] * ReionGridDim * run_globals.params.LightconeLength;
     }
 
     // create a buffer on each rank which is as large as the largest LOGICAL allocation on any single rank
@@ -713,6 +730,7 @@ void malloc_reionization_grids()
       if (run_globals.params.Flag_ConstructLightcone) {
         grids->delta_T_prev = fftwf_alloc_real((size_t)slab_n_real);
         grids->xH_prev = fftwf_alloc_real((size_t)slab_n_real);
+        grids->TS_prev = fftwf_alloc_real((size_t)slab_n_real);
       }
     }
 
@@ -724,6 +742,7 @@ void malloc_reionization_grids()
 
     if (run_globals.params.Flag_ConstructLightcone) {
       grids->xH_LightconeBox = fftwf_alloc_real((size_t)slab_n_real_xH_LC);
+      grids->TS_LightconeBox = fftwf_alloc_real((size_t)slab_n_real_TS_LC);
       grids->LightconeBox = fftwf_alloc_real((size_t)slab_n_real_LC);
       grids->Lightcone_redshifts = fftwf_alloc_real((size_t)run_globals.params.LightconeLength);
     }
@@ -769,6 +788,7 @@ void free_reionization_grids()
   if (run_globals.params.Flag_ConstructLightcone) {
     fftwf_free(grids->LightconeBox);
     fftwf_free(grids->xH_LightconeBox);
+    fftwf_free(grids->TS_LightconeBox);
   }
 
   if (run_globals.params.ReionUVBFlag) {
@@ -781,6 +801,7 @@ void free_reionization_grids()
 
     if (run_globals.params.Flag_ConstructLightcone) {
       fftwf_free(grids->xH_prev);
+      fftwf_free(grids->TS_prev);
       fftwf_free(grids->delta_T_prev);
       fftwf_free(grids->Lightcone_redshifts);
     }
@@ -1385,8 +1406,8 @@ void save_reion_output_grids(int snapshot)
 
   if (run_globals.params.Flag_ConstructLightcone && run_globals.params.EndSnapshotLightcone == snapshot &&
       snapshot != 0) {
- 
-    // create the filespace
+
+    // create the filespace //
     hsize_t dims_xH_LC[3] = { (hsize_t)ReionGridDim, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
     hid_t fspace_id_xH_LC = H5Screate_simple(3, dims_xH_LC, NULL);
 
@@ -1406,7 +1427,7 @@ void save_reion_output_grids(int snapshot)
     mlog("Outputting xH light-cone", MLOG_MESG);
     write_grid_float("xH_LightconeBox", grids->xH_LightconeBox, file_id, fspace_id_xH_LC, memspace_id_xH_LC, dcpl_id_xH_LC);
 
-    // create the filespace
+    // create the filespace //
     hsize_t dims_LC[3] = { (hsize_t)ReionGridDim, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
     hid_t fspace_id_LC = H5Screate_simple(3, dims_LC, NULL);
 
@@ -1426,7 +1447,27 @@ void save_reion_output_grids(int snapshot)
     mlog("Outputting light-cone", MLOG_MESG);
     write_grid_float("LightconeBox", grids->LightconeBox, file_id, fspace_id_LC, memspace_id_LC, dcpl_id_LC);
 
-    // create the filespace
+    // create the filespace //
+    hsize_t dims_TS_LC[3] = { (hsize_t)ReionGridDim, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
+    hid_t fspace_id_TS_LC = H5Screate_simple(3, dims_TS_LC, NULL);
+
+    // create the memspace
+    hsize_t mem_dims_TS_LC[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
+    hid_t memspace_id_TS_LC = H5Screate_simple(3, mem_dims_TS_LC,NULL);
+
+    // select a hyperslab in the filespace
+    hsize_t start_TS_LC[3] = { (hsize_t)run_globals.reion_grids.slab_ix_start[run_globals.mpi_rank], 0, 0 };
+    hsize_t count_TS_LC[3] = { (hsize_t)local_nix, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength };
+    H5Sselect_hyperslab(fspace_id_TS_LC, H5S_SELECT_SET, start_TS_LC, NULL, count_TS_LC, NULL);
+
+    // set the dataset creation property list to use chunking along x-axis
+    hid_t dcpl_id_TS_LC = H5Pcreate(H5P_DATASET_CREATE);
+    H5Pset_chunk(dcpl_id_TS_LC, 3, (hsize_t[3]){ 1, (hsize_t)ReionGridDim, (hsize_t)run_globals.params.LightconeLength });
+
+    mlog("Outputting TS light-cone", MLOG_MESG);
+    write_grid_float("TS_LightconeBox", grids->TS_LightconeBox, file_d, fspace_id_TS_LC, memspace_id_TS_LC, dcpl_id_TS_LC);
+
+    // create the filespace //
     hsize_t dims_LCz[1] = { (hsize_t)run_globals.params.LightconeLength };
     hid_t fspace_id_LCz = H5Screate_simple(1, dims_LCz, NULL);
 

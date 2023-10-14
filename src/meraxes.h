@@ -357,6 +357,7 @@ typedef struct reion_grids_t
   float* delta_T;
   float* delta_T_prev;
   float* xH_prev;
+  float* TS_prev;
   float* vel;
   fftwf_complex* vel_gradient;
   fftwf_plan vel_forward_plan;
@@ -364,6 +365,7 @@ typedef struct reion_grids_t
 
   // Grid for the lightcone (cuboid) box
   float* xH_LightconeBox;
+  float* TS_LightconeBox;
   float* LightconeBox;
   float* Lightcone_redshifts;
 
