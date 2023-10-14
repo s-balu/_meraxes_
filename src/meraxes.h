@@ -435,7 +435,7 @@ typedef struct galaxy_t
   double Fesc;
   double FescWeightedGSM;
   double MetalsStellarMass;
-  // double DiskScaleLength;
+  double DiskScaleLength;
   double Sfr;
   double EjectedGas;
   double MetalsEjectedGas;

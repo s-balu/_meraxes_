@@ -101,7 +101,7 @@ void copy_halo_props_to_galaxy(halo_t* halo, galaxy_t* gal)
   gal->Spin = calculate_spin_param(halo);
   //  gal->FOFMvirModifier = halo->FOFGroup->FOFMvirModifier;
 
-//  double sqrt_2 = 1.414213562;
+  double sqrt_2 = 1.414213562;
   if (gal->Type == 0) {
     gal->Vmax = halo->Vmax;
     gal->DiskScaleLength = gal->Spin * gal->Rvir / sqrt_2;
