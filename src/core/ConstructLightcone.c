@@ -182,6 +182,6 @@ void ConstructLightcone(int snapshot)
   // Update the previous delta_T box with the one we just finished using
   memcpy(delta_T_prev, delta_T, sizeof(float) * slab_n_real);
   memcpy(xH_prev, xH, sizeof(float) * slab_n_real);
-  memcpy(TS_prev, xH, sizeof(float) * slab_n_real);
+  memcpy(TS_prev, TS, sizeof(float) * slab_n_real);
 
 }

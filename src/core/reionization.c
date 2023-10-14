@@ -346,7 +346,7 @@ void init_reion_grids()
       if (run_globals.params.Flag_ConstructLightcone) {
         grids->delta_T_prev[ii] = 0.0;
         grids->xH_prev[ii] = 1.0;
-        grids->TS_prev[ii] = 1.0;
+        grids->TS_prev[ii] = 0.0;
 
       }
     }
@@ -372,8 +372,8 @@ void init_reion_grids()
       grids->xH_LightconeBox[ii] = 1.0;
     }
 
-    for (int ii = 0; ii < slab_n_real_xH_LC; ii++) {
-      grids->TS_LightconeBox[ii] = 1.0;
+    for (int ii = 0; ii < slab_n_real_TS_LC; ii++) {
+      grids->TS_LightconeBox[ii] = 0.0;
     }
 
     for (int ii = 0; ii < run_globals.params.LightconeLength; ii++) {
