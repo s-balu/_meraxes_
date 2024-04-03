@@ -66,6 +66,8 @@ galaxy_t* new_galaxy(int snapshot, unsigned long halo_ID)
   gal->MvirCrit = 0.0;
   gal->MergerBurstMass = 0.0;
   gal->MergerStartRadius = 0.0;
+  gal->ColdGas_pre = 0.0;
+  gal->MetalsColdGas_pre = 0.0;
 
   for (int ii = 0; ii < 3; ii++) {
     gal->Pos[ii] = (float)-99999.9;

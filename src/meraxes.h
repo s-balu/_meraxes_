@@ -442,6 +442,9 @@ typedef struct galaxy_t
   double BlackHoleAccretedHotMass;
   double BlackHoleAccretedColdMass;
   double BlackHoleAccretingColdMass;
+  double MetalsColdGas_pre; // These two "*_pre" ones are to keep track of these reserviors before SF and SNe at each snapshot.
+  double ColdGas_pre;
+
 
   // baryonic hostories
   double mwmsa_num;

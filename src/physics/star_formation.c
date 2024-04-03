@@ -101,6 +101,7 @@ void insitu_star_formation(galaxy_t* gal, int snapshot)
 
     double SfEfficiency = run_globals.params.physics.SfEfficiency;
     double SfCriticalSDNorm = run_globals.params.physics.SfCriticalSDNorm;
+
     int SfDiskVelOpt = run_globals.params.physics.SfDiskVelOpt;
     int SfPrescription = run_globals.params.physics.SfPrescription;
 
@@ -154,6 +155,9 @@ void insitu_star_formation(galaxy_t* gal, int snapshot)
 
     if (m_stars > gal->ColdGas)
       m_stars = gal->ColdGas;
+
+    gal->ColdGas_pre = gal->ColdGas;
+    gal->MetalsColdGas_pre = gal->MetalsColdGas;
 
     // calculate the total supernova feedback which would occur if this star
     // formation happened continuously and evenly throughout the snapshot
