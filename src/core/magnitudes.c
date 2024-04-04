@@ -152,11 +152,11 @@ void init_templates_mini(mag_params_t* miniSpectra,
     for (iband=0; iband<N_JWST; iband++){
         for (iwave=0; iwave<jwst_number[iband]; iwave++){
             if (iwave==0)
-                jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] +1e-4);
+                jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave] * (1.+ 1e-4);
             else if (iwave==jwst_number[iband]-1)
-                jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep] -1e-4);
+                jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave] * (1.+ -1e-4);
             else
-                jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave] * (1.+ redshifts[nAgeStep]);
+                jwst_lambda_splined[iwave+iwave_offset] = spectra[iS].waves[iwave];
 
             if (jwst_lambda_splined[iwave+iwave_offset]>91200)
                 jwst_transmission_splined[iwave+iwave_offset] = 0;
